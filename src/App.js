@@ -1,25 +1,31 @@
-import logo from './logo.svg';
+import { useState, useEffect } from 'react';
+import words from './data/data.json'
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+function App() 
+{
+	let word = localStorage.getItem("currentWord")
+	if(word == null)
+	{
+		word = words[Math.floor(Math.random()*words.length)];
+		localStorage.setItem("currentWord", word)
+	}
+	console.log("word", word)
+	return (
+		<div className="App">
+			<table className='grid'>
+			{[...Array(6)].map((x, i) =>
+				<tr className='row' key={i}>
+					{[...Array(word.length)].map((y, j) =>
+						<td key={j}>
+							<input type='text' />
+						</td>
+					)}
+				</tr>
+			)}
+			</table>
+		</div>
+	);
 }
 
 export default App;
