@@ -2,13 +2,16 @@ import { useEffect } from 'react';
 import words from './data/data.json'
 import './App.css';
 import { createRoot , Root} from 'react-dom/client';
+import  Keyboard  from "./components/Keyboard";
+
 
 function App() 
 {
 	var currentInput, currentRow
 	var word = localStorage.getItem("currentWord")
 	var attemptCount = localStorage.getItem("wordle-attemptCount") != null ? localStorage.getItem("wordle-attemptCount") : 0
-	
+	var incorrectWords = localStorage.getItem("incorrectWords") != null ? JSON.parse(localStorage.getItem("incorrectWords")) : []
+
 	if(word == null)
 	{
 		word = getNewWord()
@@ -19,6 +22,7 @@ function App()
 		const newWord = words[Math.floor(Math.random()*words.length)];
 		localStorage.setItem("currentWord", newWord)
 		console.log("newWord", newWord)
+		document.getElementById("App").style = `--wordlength:${newWord.length}`
 		return newWord;
 	}
 	function newGame()
@@ -36,11 +40,10 @@ function App()
 		updateAttempCount()
 		updateGrid()
 		document.querySelector('.restart').blur()
-		currentInput = getTargetInput()
+		currentInput = getTargetInput(true)
 	}
-	console.log("word", word)
+
 	const handleTyping = function (e){
-		console.log("e.key", e.key)
 		if(e.key == "Enter")
 		{
 			validateSelection()
@@ -61,7 +64,7 @@ function App()
 			{
 				currentInput = getTargetInput()
 			}
-			console.log("currentInput", currentInput)
+
 			if(currentInput != null)
 			{
 				currentInput.value = e.key;
@@ -75,6 +78,7 @@ function App()
 			e.preventDefault()
 		}
 	}
+	
 	function getTargetInput(forceNewRow = false)
 	{
 		if(currentRow == null || forceNewRow)
@@ -100,7 +104,7 @@ function App()
 		{
 			currentRow = (document.querySelector('.row:not(.over)'))
 		}
-		console.log("currentRow", currentRow)
+		
 		if(currentRow != null)
 		{
 			let selection = "";
@@ -115,10 +119,6 @@ function App()
 				attemptCount += 1
 				localStorage.getItem("wordle-attemptCount", attemptCount)
 				updateAttempCount()
-				// console.log("selection", selection)
-				// console.log("word", word)
-				// console.log("selection.length < word.length", selection.length < word.length)
-				// console.log("!words.includes(selection)", !words.includes(selection))
 				setRowColors(currentRow)
 				if(selection == word)
 				{
@@ -160,8 +160,6 @@ function App()
 	function getClassnameInput(value = null, index, rowValues)
 	{
 		let classNameInput = ""
-		// console.log("value", value)
-		// console.log("word[index]", word[index])
 		if(value != null && value != "")
 		{
 			classNameInput += " typed"
@@ -189,16 +187,21 @@ function App()
 				if(countCorrect < countThisLetter && almosts <= countThisLetter)
 					classNameInput += " almost"
 			}
+			else{
+				if(!incorrectWords.includes(value))
+				{
+					incorrectWords.push(value)
+					localStorage.setItem('incorrectWords', JSON.stringify(incorrectWords))
+				}
+			}
 		}
-		console.log("classNameInput", classNameInput)
+		
 		return classNameInput;
 	}
 	function resetRow(row)
 	{
-		console.log("resetRow")
 		row.querySelectorAll('input').forEach(input => resetInput(input))
 		currentInput = getTargetInput()
-		console.log('currentInput', currentInput)
 	}
 	function resetInput(input)
 	{
@@ -220,7 +223,11 @@ function App()
 			<div className={rowClassname} key={i}>
 				{[...Array(word.length)].map((y, j) => {
 					let value = localStorage.getItem('wordle-input-'+i+'-'+j);
-					let classNameInput = getClassnameInput(value, j, rowValues)
+					let classNameInput = (value != null ? "typed" : "")
+					if(rowClassname.includes("over"))
+					{
+						classNameInput = getClassnameInput(value, j, rowValues)
+					}
 					return (
 						<input key={j} id={i+'-'+j} 
 							maxLength={1} pattern='[a-zA-Z]' type='text' 
@@ -261,7 +268,7 @@ function App()
 		window.addEventListener('keydown', handleTyping)
 	}, [])
 	return (
-		<div className="App" style={{'--wordlength': word.length}}>
+		<div id='App' className="App" style={{'--wordlength': word.length}}>
 			<div id='attemptsContainer'>
 				{genAttempCount()}
 			</div>
@@ -273,6 +280,7 @@ function App()
 					<path d="M18.364 8.05026L17.6569 7.34315C14.5327 4.21896 9.46734 4.21896 6.34315 7.34315C3.21895 10.4673 3.21895 15.5327 6.34315 18.6569C9.46734 21.7811 14.5327 21.7811 17.6569 18.6569C19.4737 16.84 20.234 14.3668 19.9377 12.0005M18.364 8.05026H14.1213M18.364 8.05026V3.80762" stroke="#1C274C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
 				</svg>
 			</button>
+			<Keyboard/>
 		</div>
 	);
 }

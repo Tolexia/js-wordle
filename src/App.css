@@ -3,7 +3,7 @@
   --bg: #262625;
   --almost: rgb(213, 140, 3);
   --correct: rgb(38, 213, 3);
-  --marginRight: 2px;
+  --margin: 5px;
 }
 *{
   box-sizing: border-box;
@@ -28,7 +28,7 @@ html, body, #root, .App {
 .App{
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-around;
   align-items: center;
 }
 
@@ -44,12 +44,13 @@ html, body, #root, .App {
 }
 .grid input
 {
-  margin-right: var(--marginRight);
+  margin-right: var(--margin);
+  margin-bottom: var(--margin);
   /* flex-shrink: 1; */
   /* width: 3em; */
   /* height: 3em; */
-  width: min(3em, calc(90vw / var(--wordlength) - var(--marginRight)));
-  height: min(3em, calc(90vw / var(--wordlength) - var(--marginRight)));
+  width: min(3em, calc(90vw / var(--wordlength) - var(--margin)));
+  height: min(3em, calc(90vw / var(--wordlength) - var(--margin)));
   border: 1px  solid var(--color);
   background: transparent;
   padding: 5px;
