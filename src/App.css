@@ -1,9 +1,13 @@
-*{
-  box-sizing: border-box;
-}
 :root{
   --color: beige;
   --bg: #262525;
+}
+*{
+  box-sizing: border-box;
+  color: var(--color);
+}
+button, a{
+  cursor: pointer;
 }
 html, body, #root, .App {
   padding: 0;
@@ -44,4 +48,11 @@ html, body, #root, .App {
   text-transform: uppercase;
   font-size: 1.25em;
   pointer-events: none;
+}
+.restart{
+  border: none;
+  background: transparent;
+}
+.restart path{
+  stroke: var(--color);
 }
