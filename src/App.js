@@ -32,10 +32,10 @@ function App()
 			}
 		}
 		// document.querySelectorAll('.row input').forEach(input => input.value = "")
-		const tbody = document.querySelector('.grid tbody')
-		const cloneTbody = tbody.cloneNode()
-		tbody.replaceWith(cloneTbody)
-		createRoot(cloneTbody).render(generateGrid())
+		attemptCount = 0
+		updateAttempCount()
+		updateGrid()
+		currentInput = getTargetInput()
 	}
 	console.log("word", word)
 	const handleTyping = function (e){
@@ -88,6 +88,10 @@ function App()
 				return inputEmpty;
 			}
 		}
+		else{
+			return null;
+		}
+		
 	}
 	function validateSelection()
 	{
@@ -103,7 +107,8 @@ function App()
 			inputsInRow.forEach(input => selection += input.value)
 			if(selection == word)
 			{
-				alert('won')
+				setRowColors(currentRow)
+				gameOver('You won !')
 			}
 			else
 			{
@@ -118,15 +123,50 @@ function App()
 				else
 				{
 					currentRow.classList.add('over')
+					setRowColors(currentRow)
 					currentInput = getTargetInput(true)
+					if(!currentInput)
+					{
+						gameOver('You lost... Try again !')
+					}
 					attemptCount += 1
-					const attemptsContainer = document.getElementById('attemptsContainer')
-					const cloneAttemptsContainer = attemptsContainer.cloneNode()
-					attemptsContainer.replaceWith(cloneAttemptsContainer)
-					createRoot(cloneAttemptsContainer).render(updateAttempCount())
+					localStorage.getItem("wordle-attemptCount", attemptCount)
+					updateAttempCount()
 				}
 			}
 		}
+	}
+	function gameOver(result)
+	{
+		document.querySelectorAll('.grid input:not(.typed)').forEach(input => {
+			input.classList.add('typed')
+			localStorage.setItem('wordle-input-'+input.id, "")
+		})
+		alert(result)
+	}
+	function setRowColors(row)
+	{
+		const rowInputs = row.getElementsByTagName('input')
+		for (let index = 0; index < rowInputs.length; index++) {
+			const input = rowInputs[index];
+			input.className = getClassnameInput(input.value, index)
+		}
+	}
+	function getClassnameInput(value = null, index)
+	{
+		let classNameInput = ""
+		console.log("value", value)
+		console.log("word[index]", word[index])
+		if(value != null && value != "")
+		{
+			classNameInput += " typed"
+			if(value == word[index])
+				classNameInput += " correct"
+			else if(word.includes(value))
+				classNameInput += " almost"
+		}
+		console.log("classNameInput", classNameInput)
+		return classNameInput;
 	}
 	function resetRow(row)
 	{
@@ -155,10 +195,11 @@ function App()
 			<tr className={rowClassname} key={i}>
 				{[...Array(word.length)].map((y, j) => {
 					let value = localStorage.getItem('wordle-input-'+i+'-'+j);
+					let classNameInput = getClassnameInput(value, j)
 					return (<td key={j}>
 						<input id={i+'-'+j} 
 							maxLength={1} pattern='[a-zA-Z]' type='text' 
-							className={value != null ? "typed" : ""}
+							className={classNameInput}
 							value={value != null ? value : ""} 
 							onChange={()=>{}}
 						/>
@@ -170,7 +211,21 @@ function App()
 		}
 		))
 	}
+	function updateGrid()
+	{
+		const tbody = document.querySelector('.grid tbody')
+		const cloneTbody = tbody.cloneNode()
+		tbody.replaceWith(cloneTbody)
+		createRoot(cloneTbody).render(generateGrid())
+	}
 	function updateAttempCount()
+	{
+		const attemptsContainer = document.getElementById('attemptsContainer')
+		const cloneAttemptsContainer = attemptsContainer.cloneNode()
+		attemptsContainer.replaceWith(cloneAttemptsContainer)
+		createRoot(cloneAttemptsContainer).render(genAttempCount())
+	}
+	function genAttempCount()
 	{
 		return (<h4>
 			Attempts: <span>{attemptCount}</span>
@@ -183,7 +238,7 @@ function App()
 	return (
 		<div className="App">
 			<div id='attemptsContainer'>
-				{updateAttempCount()}
+				{genAttempCount()}
 			</div>
 			<table className='grid'>
 				<tbody>

@@ -1,6 +1,9 @@
 :root{
   --color: beige;
-  --bg: #262525;
+  --bg: #262625;
+  --almost: rgb(213, 140, 3);
+  --correct: rgb(38, 213, 3);
+
 }
 *{
   box-sizing: border-box;
@@ -48,6 +51,15 @@ html, body, #root, .App {
   text-transform: uppercase;
   font-size: 1.25em;
   pointer-events: none;
+}
+.grid input.typed{
+  /* opacity: .8; */
+}
+.grid input.almost{
+  background: var(--almost);
+}
+.grid input.correct{
+  background: var(--correct);
 }
 .restart{
   border: none;
