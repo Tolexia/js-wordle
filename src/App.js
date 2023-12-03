@@ -35,6 +35,7 @@ function App()
 		attemptCount = 0
 		updateAttempCount()
 		updateGrid()
+		document.querySelector('.restart').blur()
 		currentInput = getTargetInput()
 	}
 	console.log("word", word)
@@ -105,33 +106,32 @@ function App()
 			let selection = "";
 			const inputsInRow = currentRow.querySelectorAll('input')
 			inputsInRow.forEach(input => selection += input.value)
-			if(selection == word)
+			if(selection.length < word.length || !words.includes(selection))
 			{
-				setRowColors(currentRow)
-				gameOver('You won !')
+				resetRow(currentRow)
 			}
 			else
 			{
-				console.log("selection", selection)
-				console.log("word", word)
-				console.log("selection.length < word.length", selection.length < word.length)
-				console.log("!words.includes(selection)", !words.includes(selection))
-				if(selection.length < word.length || !words.includes(selection))
+				attemptCount += 1
+				localStorage.getItem("wordle-attemptCount", attemptCount)
+				updateAttempCount()
+				// console.log("selection", selection)
+				// console.log("word", word)
+				// console.log("selection.length < word.length", selection.length < word.length)
+				// console.log("!words.includes(selection)", !words.includes(selection))
+				setRowColors(currentRow)
+				if(selection == word)
 				{
-					resetRow(currentRow)
+					gameOver('You won !')
 				}
 				else
 				{
 					currentRow.classList.add('over')
-					setRowColors(currentRow)
 					currentInput = getTargetInput(true)
 					if(!currentInput)
 					{
 						gameOver('You lost... Try again !')
 					}
-					attemptCount += 1
-					localStorage.getItem("wordle-attemptCount", attemptCount)
-					updateAttempCount()
 				}
 			}
 		}
@@ -147,23 +147,48 @@ function App()
 	function setRowColors(row)
 	{
 		const rowInputs = row.getElementsByTagName('input')
+		const rowValues = []
 		for (let index = 0; index < rowInputs.length; index++) {
 			const input = rowInputs[index];
-			input.className = getClassnameInput(input.value, index)
+			rowValues.push(input.value)
+		}
+		for (let index = 0; index < rowInputs.length; index++) {
+			const input = rowInputs[index];
+			input.className = getClassnameInput(input.value, index, rowValues)
 		}
 	}
-	function getClassnameInput(value = null, index)
+	function getClassnameInput(value = null, index, rowValues)
 	{
 		let classNameInput = ""
-		console.log("value", value)
-		console.log("word[index]", word[index])
+		// console.log("value", value)
+		// console.log("word[index]", word[index])
 		if(value != null && value != "")
 		{
 			classNameInput += " typed"
 			if(value == word[index])
 				classNameInput += " correct"
 			else if(word.includes(value))
-				classNameInput += " almost"
+			{
+				let countCorrect = 0
+				let almosts = 1
+				let countThisLetter = 0
+				for (let wordIndex = 0; wordIndex < word.length; wordIndex++) 
+				{
+					const wordLetter = word[wordIndex];
+					if(value == wordLetter){
+						countThisLetter++
+						if(wordLetter == rowValues[wordIndex])
+						{
+							countCorrect++
+						}
+						else if(wordIndex != index && wordIndex < index){
+							almosts++
+						}
+					}
+				}
+				if(countCorrect < countThisLetter && almosts <= countThisLetter)
+					classNameInput += " almost"
+			}
 		}
 		console.log("classNameInput", classNameInput)
 		return classNameInput;
@@ -192,31 +217,31 @@ function App()
 			}
 			const rowClassname = rowValues.length == word.length ? "row over" : "row"
 			return (
-			<tr className={rowClassname} key={i}>
+			<div className={rowClassname} key={i}>
 				{[...Array(word.length)].map((y, j) => {
 					let value = localStorage.getItem('wordle-input-'+i+'-'+j);
-					let classNameInput = getClassnameInput(value, j)
-					return (<td key={j}>
-						<input id={i+'-'+j} 
+					let classNameInput = getClassnameInput(value, j, rowValues)
+					return (
+						<input key={j} id={i+'-'+j} 
 							maxLength={1} pattern='[a-zA-Z]' type='text' 
 							className={classNameInput}
 							value={value != null ? value : ""} 
 							onChange={()=>{}}
 						/>
-					</td>)
+					)
 				}
 				)}
-			</tr>
+			</div>
 			)
 		}
 		))
 	}
 	function updateGrid()
 	{
-		const tbody = document.querySelector('.grid tbody')
-		const cloneTbody = tbody.cloneNode()
-		tbody.replaceWith(cloneTbody)
-		createRoot(cloneTbody).render(generateGrid())
+		const grid = document.querySelector('.grid')
+		const clonegrid = grid.cloneNode()
+		grid.replaceWith(clonegrid)
+		createRoot(clonegrid).render(generateGrid())
 	}
 	function updateAttempCount()
 	{
@@ -236,15 +261,13 @@ function App()
 		window.addEventListener('keydown', handleTyping)
 	}, [])
 	return (
-		<div className="App">
+		<div className="App" style={{'--wordlength': word.length}}>
 			<div id='attemptsContainer'>
 				{genAttempCount()}
 			</div>
-			<table className='grid'>
-				<tbody>
+			<div className='grid'>
 				{generateGrid()}
-				</tbody>
-			</table>
+			</div>
 			<button  className="restart" type="button" onClick={() => newGame()}>
 				<svg width="3em" height="3em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 					<path d="M18.364 8.05026L17.6569 7.34315C14.5327 4.21896 9.46734 4.21896 6.34315 7.34315C3.21895 10.4673 3.21895 15.5327 6.34315 18.6569C9.46734 21.7811 14.5327 21.7811 17.6569 18.6569C19.4737 16.84 20.234 14.3668 19.9377 12.0005M18.364 8.05026H14.1213M18.364 8.05026V3.80762" stroke="#1C274C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
