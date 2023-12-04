@@ -1,7 +1,7 @@
-import { keyboard } from "@testing-library/user-event/dist/keyboard";
 import "../stylesheets/Keyboard.css"
 import {ReactComponent as Backspace} from '../Backspace.svg'
 import {ReactComponent as Enter} from '../Enter.svg'
+
 
 const Keyboard =  function ()
 {

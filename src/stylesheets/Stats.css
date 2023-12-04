@@ -1,0 +1,25 @@
+.swal2-popup{
+    background-color: var(--bg);
+}
+.stats-container{
+    height: 100% ;
+    width: 90% ;
+    border-left: 1px solid var(--color);
+}
+
+.stats-row {
+    background-color: var(--correct);
+    position: relative;
+}
+.stat-key, .stat-value{
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.stat-key {
+    left: -1em;
+}
+
+.stat-value {
+    right: -1em;
+}

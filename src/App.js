@@ -3,7 +3,9 @@ import words from './data/data.json'
 import './App.css';
 import { createRoot , Root} from 'react-dom/client';
 import  Keyboard  from "./components/Keyboard";
-
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+import Stats from './components/Stats';
 
 function App() 
 {
@@ -142,7 +144,22 @@ function App()
 			input.classList.add('typed')
 			localStorage.setItem('wordle-input-'+input.id, "")
 		})
-		alert(result)
+		const previousGames = (localStorage.getItem('wordle-stats') != null ? JSON.parse(localStorage.getItem('wordle-stats')) : {})
+		typeof previousGames[attemptCount] != "undefined" ? previousGames[attemptCount] += 1 : previousGames[attemptCount] = 1;
+		localStorage.setItem('wordle-stats', JSON.stringify(previousGames))
+		// alert(result)
+		const MySwal = withReactContent(Swal)
+
+		MySwal.fire({
+		title: <h2>Stats</h2>,
+		html: <Stats data = {previousGames}/>,
+		// didOpen: () => {
+		// 	MySwal.showLoading()
+		// 	},
+		})
+		.then(() => {
+		return MySwal.fire(<Stats data = {previousGames}/>)
+		})
 	}
 	function setRowColors(row)
 	{
@@ -211,7 +228,7 @@ function App()
 	}
 	function generateGrid()
 	{
-		return ([...Array(6)].map((x, i) => {
+		return ([...Array(5)].map((x, i) => {
 			const rowValues = [];
 			for (let rowKey = 0; rowKey < word.length; rowKey++) {
 				let value = localStorage.getItem('wordle-input-'+i+'-'+rowKey);
