@@ -30,6 +30,7 @@ html, body, #root, .App {
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
+  min-height: 90vh;
 }
 
 .grid{

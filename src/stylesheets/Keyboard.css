@@ -1,6 +1,6 @@
 .keyboard {
     width: min(600px, 95vw);
-    --marginButtons: 2px;
+    --marginButtons: 4px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -15,7 +15,7 @@
     background: rgba(128, 128, 128, 0.685);
     text-transform: uppercase;
     width: min(3em, calc(90vw / 10 - var(--marginButtons)));
-    height: min(3em, calc(90vw / 10 - var(--marginButtons)));
+    height: 4.5em;
 }
 .keyboard-button.extended{
     width: min(6em, calc(90vw / 5));
