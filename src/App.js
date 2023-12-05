@@ -12,7 +12,7 @@ function App()
 	var currentInput, currentRow
 	var word = localStorage.getItem("currentWord")
 	var attemptCount = localStorage.getItem("wordle-attemptCount") != null ? localStorage.getItem("wordle-attemptCount") : 0
-	var incorrectWords = localStorage.getItem("incorrectWords") != null ? JSON.parse(localStorage.getItem("incorrectWords")) : []
+	var incorrectLetters = localStorage.getItem("wordle-incorrectLetters") != null ? JSON.parse(localStorage.getItem("wordle-incorrectLetters")) : []
 
 	if(word == null)
 	{
@@ -32,7 +32,7 @@ function App()
 		word = getNewWord()
 		for(let key in localStorage)
 		{
-			if(key.includes('wordle-input') || key.includes('wordle-attemptCount'))
+			if(key.includes('wordle-input') || key.includes('wordle-attemptCount') || key.includes('wordle-incorrectLetters'))
 			{
 				localStorage.removeItem(key)
 			}
@@ -157,51 +157,53 @@ function App()
 	function setRowColors(row)
 	{
 		const rowInputs = row.getElementsByTagName('input')
-		const rowValues = []
+		console.log("row", row)
 		for (let index = 0; index < rowInputs.length; index++) {
 			const input = rowInputs[index];
-			rowValues.push(input.value)
-		}
-		for (let index = 0; index < rowInputs.length; index++) {
-			const input = rowInputs[index];
-			input.className = getClassnameInput(input.value, index, rowValues)
+			console.log("input", input)
+			input.className = getClassnameInput(input.value, index, row)
 		}
 	}
-	function getClassnameInput(value = null, index, rowValues)
+	console.log("word", word)
+	function getClassnameInput(value = null, index, row)
 	{
 		let classNameInput = ""
 		if(value != null && value != "")
 		{
 			classNameInput += " typed"
 			if(value == word[index])
+			{
 				classNameInput += " correct"
+			}
 			else if(word.includes(value))
 			{
-				let countCorrect = 0
-				let almosts = 1
+				let corrects = row.querySelectorAll(`.correct[value="${value}"]`)
+				let almosts = row.querySelectorAll(`.almost[value="${value}"]`)
 				let countThisLetter = 0
 				for (let wordIndex = 0; wordIndex < word.length; wordIndex++) 
 				{
 					const wordLetter = word[wordIndex];
-					if(value == wordLetter){
+					if(value == wordLetter)
 						countThisLetter++
-						if(wordLetter == rowValues[wordIndex])
-						{
-							countCorrect++
-						}
-						else if(wordIndex != index && wordIndex < index){
-							almosts++
-						}
-					}
+					
 				}
-				if(countCorrect < countThisLetter && almosts <= countThisLetter)
+				
+				console.log("value", value)
+				console.log("countThisLetter", countThisLetter)
+				console.log("almosts", almosts)
+				console.log("corrects", corrects)
+				console.log("corrects.length + almosts.length", corrects.length + almosts.length)
+				if((corrects.length + almosts.length) <= countThisLetter)
+				{
+					console.log("almost")
 					classNameInput += " almost"
+				}
 			}
 			else{
-				if(!incorrectWords.includes(value))
+				if(!incorrectLetters.includes(value))
 				{
-					incorrectWords.push(value)
-					localStorage.setItem('incorrectWords', JSON.stringify(incorrectWords))
+					incorrectLetters.push(value)
+					localStorage.setItem('incorrectLetters', JSON.stringify(incorrectLetters))
 				}
 			}
 		}
@@ -234,10 +236,6 @@ function App()
 				{[...Array(word.length)].map((y, j) => {
 					let value = localStorage.getItem('wordle-input-'+i+'-'+j);
 					let classNameInput = (value != null ? "typed" : "")
-					if(rowClassname.includes("over"))
-					{
-						classNameInput = getClassnameInput(value, j, rowValues)
-					}
 					return (
 						<input key={j} id={i+'-'+j} 
 							maxLength={1} pattern='[a-zA-Z]' type='text' 
@@ -276,6 +274,7 @@ function App()
 	}
 	useEffect(()=>{
 		window.addEventListener('keydown', handleTyping)
+		document.querySelectorAll('.grid .row').forEach(row => setRowColors(row))
 	}, [])
 	return (
 		<div id='App' className="App" style={{'--wordlength': word.length}}>
