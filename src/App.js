@@ -149,16 +149,9 @@ function App()
 		localStorage.setItem('wordle-stats', JSON.stringify(previousGames))
 		// alert(result)
 		const MySwal = withReactContent(Swal)
-
 		MySwal.fire({
-		title: <h2>Stats</h2>,
-		html: <Stats data = {previousGames}/>,
-		// didOpen: () => {
-		// 	MySwal.showLoading()
-		// 	},
-		})
-		.then(() => {
-		return MySwal.fire(<Stats data = {previousGames}/>)
+			title:<h2>Stats</h2>,
+			html:<Stats data = {previousGames}/>
 		})
 	}
 	function setRowColors(row)
