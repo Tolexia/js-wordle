@@ -18,7 +18,7 @@ function App()
 	{
 		word = getNewWord()
 	}
-
+	
 	function getNewWord()
 	{
 		const newWord = words[Math.floor(Math.random()*words.length)];
@@ -150,8 +150,8 @@ function App()
 		// alert(result)
 		const MySwal = withReactContent(Swal)
 		MySwal.fire({
-			title:<h2>Stats</h2>,
-			html:<Stats data = {previousGames}/>
+			title: "Stats",
+			html: <Stats data = {previousGames}/>
 		})
 	}
 	function setRowColors(row)

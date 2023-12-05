@@ -5,11 +5,19 @@
     height: 100% ;
     width: 90% ;
     border-left: 1px solid var(--color);
+    min-height: fit-content;
+    margin-left: 1em;
 }
 
 .stats-row {
     background-color: var(--correct);
     position: relative;
+    height: 2em;
+    min-width: 2px;
+}
+.stats-row:not(:last-child)
+{
+    margin-bottom: 4px;
 }
 .stat-key, .stat-value{
     position: absolute;
@@ -21,5 +29,5 @@
 }
 
 .stat-value {
-    right: -1em;
+    right: -1.5em;
 }

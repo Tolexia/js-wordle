@@ -8,15 +8,17 @@ const Stats = function(props)
         if(data[key] > maxStat)
             maxStat = data[key]
     });
+    console.log("data", data)
     return (
         <div className='stats-container'>
             {
                 [...Array(5)].map((x, i) => 
                 {
-                    const value = (typeof data[x] != "undefined" ? data[x] : 0)
+                    console.log("i", i)
+                    const value = (typeof data[i] != "undefined" ? data[i] : 0)
                     return (
                     <div className='stats-row' key={i} style={{width:`calc( 100% * ${value} / ${maxStat} )`}}>
-                        <span className='stat-key'>{x}</span>
+                        <span className='stat-key'>{i+1}</span>
                         <span className='stat-value'>{value}</span>
                     </div>
                     )
