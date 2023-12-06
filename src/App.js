@@ -166,7 +166,7 @@ function App()
 			const input = rowInputs[index];
 			if(input.value != "")
 			{
-				if(value == word[index] && !input.classList.contains("correct"))
+				if(input.value == word[index] && !input.classList.contains("correct"))
 				{
 					input.className += " correct"
 				}
@@ -180,15 +180,15 @@ function App()
 			const input = rowInputs[index];
 			if(input.value != "")
 			{
-				if(word.includes(value))
+				if(word.includes(input.value))
 				{
-					let corrects = row.querySelectorAll(`.correct[value="${value}"]`)
-					let almosts = row.querySelectorAll(`.almost[value="${value}"]`)
+					let corrects = row.querySelectorAll(`.correct[value="${input.value}"]`)
+					let almosts = row.querySelectorAll(`.almost[value="${input.value}"]`)
 					let countThisLetter = 0
 					for (let wordIndex = 0; wordIndex < word.length; wordIndex++) 
 					{
 						const wordLetter = word[wordIndex];
-						if(value == wordLetter)
+						if(input.value == wordLetter)
 							countThisLetter++
 						
 					}
@@ -199,9 +199,9 @@ function App()
 					}
 				}
 				else{
-					if(!incorrectLetters.includes(value))
+					if(!incorrectLetters.includes(input.value))
 					{
-						incorrectLetters.push(value)
+						incorrectLetters.push(input.value)
 						localStorage.setItem('incorrectLetters', JSON.stringify(incorrectLetters))
 					}
 				}
