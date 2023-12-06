@@ -151,62 +151,65 @@ function App()
 		const MySwal = withReactContent(Swal)
 		MySwal.fire({
 			title: "Stats",
-			html: <Stats data = {previousGames}/>
+			html: <Stats data = {previousGames} word={word}/>
 		})
 	}
 	function setRowColors(row)
+	{
+		setCorrects(row)
+		setAlmostsAndIncorrects(row)
+	}
+	function setCorrects(row)
 	{
 		const rowInputs = row.getElementsByTagName('input')
 		for (let index = 0; index < rowInputs.length; index++) {
 			const input = rowInputs[index];
 			if(input.value != "")
 			{
-				const className = getClassnameInput(input.value, index, row)
-				input.className = className
+				if(value == word[index] && !input.classList.contains("correct"))
+				{
+					input.className += " correct"
+				}
+			}
+		}
+	}
+	function setAlmostsAndIncorrects(row)
+	{
+		const rowInputs = row.getElementsByTagName('input')
+		for (let index = 0; index < rowInputs.length; index++) {
+			const input = rowInputs[index];
+			if(input.value != "")
+			{
+				if(word.includes(value))
+				{
+					let corrects = row.querySelectorAll(`.correct[value="${value}"]`)
+					let almosts = row.querySelectorAll(`.almost[value="${value}"]`)
+					let countThisLetter = 0
+					for (let wordIndex = 0; wordIndex < word.length; wordIndex++) 
+					{
+						const wordLetter = word[wordIndex];
+						if(value == wordLetter)
+							countThisLetter++
+						
+					}
+					
+					if((corrects.length + almosts.length) < countThisLetter && !input.classList.contains("correct") && !input.classList.contains("almost"))
+					{
+						input.className += " almost"
+					}
+				}
+				else{
+					if(!incorrectLetters.includes(value))
+					{
+						incorrectLetters.push(value)
+						localStorage.setItem('incorrectLetters', JSON.stringify(incorrectLetters))
+					}
+				}
 			}
 		}
 	}
 	console.log("word", word)
-	function getClassnameInput(value = null, index, row)
-	{
-		let classNameInput = ""
-		if(value != null && value != "")
-		{
-			classNameInput += " typed"
-			if(value == word[index])
-			{
-				classNameInput += " correct"
-			}
-			else if(word.includes(value))
-			{
-				let corrects = row.querySelectorAll(`.correct[value="${value}"]`)
-				let almosts = row.querySelectorAll(`.almost[value="${value}"]`)
-				let countThisLetter = 0
-				for (let wordIndex = 0; wordIndex < word.length; wordIndex++) 
-				{
-					const wordLetter = word[wordIndex];
-					if(value == wordLetter)
-						countThisLetter++
-					
-				}
-				
-				if((corrects.length + almosts.length) < countThisLetter)
-				{
-					console.log("almost")
-					classNameInput += " almost"
-				}
-			}
-			else{
-				if(!incorrectLetters.includes(value))
-				{
-					incorrectLetters.push(value)
-					localStorage.setItem('incorrectLetters', JSON.stringify(incorrectLetters))
-				}
-			}
-		}
-		
-		return classNameInput;
-	}
+
 	function resetRow(row)
 	{
 		row.querySelectorAll('input').forEach(input => resetInput(input))
@@ -232,9 +235,11 @@ function App()
 			<div className={rowClassname} key={i}>
 				{[...Array(word.length)].map((y, j) => {
 					let value = localStorage.getItem('wordle-input-'+i+'-'+j);
+					const className = (value != null ? "typed" : "")
 					return (
 						<input key={j} id={i+'-'+j} 
 							maxLength={1} pattern='[a-zA-Z]' type='text' 
+							className={className}
 							value={value != null ? value : ""} 
 							onChange={()=>{}}
 						/>

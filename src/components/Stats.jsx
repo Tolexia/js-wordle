@@ -10,21 +10,23 @@ const Stats = function(props)
     });
     console.log("data", data)
     return (
-        <div className='stats-container'>
-            {
-                [...Array(5)].map((x, i) => 
+        <div>
+            <p>Word : {props.word}</p>
+            <div className='stats-container'>
                 {
-                    console.log("i", i)
-                    const value = (typeof data[i] != "undefined" ? data[i] : 0)
-                    return (
-                    <div className='stats-row' key={i} style={{width:`calc( 100% * ${value} / ${maxStat} )`}}>
-                        <span className='stat-key'>{i+1}</span>
-                        <span className='stat-value'>{value}</span>
-                    </div>
+                    [...Array(5)].map((x, i) => 
+                    {
+                        const value = (typeof data[i] != "undefined" ? data[i] : 0)
+                        return (
+                        <div className='stats-row' key={i} style={{width:`calc( 100% * ${value} / ${maxStat} )`}}>
+                            <span className='stat-key'>{i+1}</span>
+                            <span className='stat-value'>{value}</span>
+                        </div>
+                        )
+                    }
                     )
                 }
-                )
-            }
+            </div>
         </div>
     );
 }
