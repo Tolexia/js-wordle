@@ -274,7 +274,7 @@ function App()
 	}
 	useEffect(()=>{
 		window.addEventListener('keydown', handleTyping)
-		const rows = document.querySelectorAll('.grid .row')
+		const rows = document.querySelectorAll('.grid .row.over')
 		rows.forEach(row => setRowColors(row))
 	}, [])
 	return (
