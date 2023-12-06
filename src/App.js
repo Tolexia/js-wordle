@@ -119,7 +119,7 @@ function App()
 			else
 			{
 				attemptCount += 1
-				localStorage.getItem("wordle-attemptCount", attemptCount)
+				localStorage.setItem("wordle-attemptCount", attemptCount)
 				updateAttempCount()
 				setRowColors(currentRow)
 				if(selection == word)
