@@ -13,7 +13,7 @@ function App()
 	var word = localStorage.getItem("currentWord")
 	var attemptCount = localStorage.getItem("wordle-attemptCount") != null ? localStorage.getItem("wordle-attemptCount") : 0
 	var incorrectLetters = localStorage.getItem("wordle-incorrectLetters") != null ? JSON.parse(localStorage.getItem("wordle-incorrectLetters")) : []
-
+	
 	if(word == null)
 	{
 		word = getNewWord()
@@ -157,11 +157,13 @@ function App()
 	function setRowColors(row)
 	{
 		const rowInputs = row.getElementsByTagName('input')
-		console.log("row", row)
 		for (let index = 0; index < rowInputs.length; index++) {
 			const input = rowInputs[index];
-			console.log("input", input)
-			input.className = getClassnameInput(input.value, index, row)
+			if(input.value != "")
+			{
+				const className = getClassnameInput(input.value, index, row)
+				input.className = className
+			}
 		}
 	}
 	console.log("word", word)
@@ -188,12 +190,7 @@ function App()
 					
 				}
 				
-				console.log("value", value)
-				console.log("countThisLetter", countThisLetter)
-				console.log("almosts", almosts)
-				console.log("corrects", corrects)
-				console.log("corrects.length + almosts.length", corrects.length + almosts.length)
-				if((corrects.length + almosts.length) <= countThisLetter)
+				if((corrects.length + almosts.length) < countThisLetter)
 				{
 					console.log("almost")
 					classNameInput += " almost"
@@ -235,11 +232,9 @@ function App()
 			<div className={rowClassname} key={i}>
 				{[...Array(word.length)].map((y, j) => {
 					let value = localStorage.getItem('wordle-input-'+i+'-'+j);
-					let classNameInput = (value != null ? "typed" : "")
 					return (
 						<input key={j} id={i+'-'+j} 
 							maxLength={1} pattern='[a-zA-Z]' type='text' 
-							className={classNameInput}
 							value={value != null ? value : ""} 
 							onChange={()=>{}}
 						/>
@@ -274,7 +269,8 @@ function App()
 	}
 	useEffect(()=>{
 		window.addEventListener('keydown', handleTyping)
-		document.querySelectorAll('.grid .row').forEach(row => setRowColors(row))
+		const rows = document.querySelectorAll('.grid .row')
+		rows.forEach(row => setRowColors(row))
 	}, [])
 	return (
 		<div id='App' className="App" style={{'--wordlength': word.length}}>
