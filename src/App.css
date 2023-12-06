@@ -30,7 +30,8 @@ html, body, #root, .App {
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  min-height: 90vh;
+  min-height: 70vh;
+  max-height: 80vh;
 }
 
 .grid{
@@ -76,4 +77,11 @@ html, body, #root, .App {
 }
 .restart path{
   stroke: var(--color);
+}
+
+@media screen and (min-width:1200px) {
+  .App{
+    min-height: 100vh;
+    max-height: 100vh;
+  }
 }

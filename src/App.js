@@ -39,8 +39,10 @@ function App()
 		}
 		// document.querySelectorAll('.row input').forEach(input => input.value = "")
 		attemptCount = 0
-		updateAttempCount()
-		updateGrid()
+		incorrectLetters = []
+		refreshComponent('attemptsContainer', genAttempCount)
+		refreshComponent('grid', generateGrid)
+		refreshComponent('keyboardContainer', genKeyboard)
 		document.querySelector('.restart').blur()
 		currentInput = getTargetInput(true)
 	}
@@ -121,7 +123,7 @@ function App()
 			{
 				attemptCount += 1
 				localStorage.setItem("wordle-attemptCount", attemptCount)
-				updateAttempCount()
+				refreshComponent('attemptsContainer', genAttempCount)
 				currentRow.classList.add('over')
 				setRowColors(currentRow)
 				if(selection == word)
@@ -160,6 +162,7 @@ function App()
 		setCorrects(row)
 		setAlmosts(row)
 		setIncorrects(row)
+		refreshComponent('keyboardContainer', genKeyboard)
 	}
 	function setCorrects(row)
 	{
@@ -182,10 +185,10 @@ function App()
 			const input = rowInputs[index];
 			if(input.value != "")
 			{
-				if(!incorrectLetters.includes(input.value))
+				if(!word.includes(input.value) && !incorrectLetters.includes(input.value))
 				{
 					incorrectLetters.push(input.value)
-					localStorage.setItem('incorrectLetters', JSON.stringify(incorrectLetters))
+					localStorage.setItem('wordle-incorrectLetters', JSON.stringify(incorrectLetters))
 				}
 			}
 		}
@@ -227,9 +230,6 @@ function App()
 							countThisLetter++
 						
 					}
-					// console.log("countThisLetter", countThisLetter);
-					// console.log("countCorrects", countCorrects);
-					// console.log("countAlmosts", countAlmosts);
 					if((countCorrects + countAlmosts) < countThisLetter && !input.classList.contains("correct") && !input.classList.contains("almost"))
 					{
 						input.className += " almost"
@@ -238,7 +238,7 @@ function App()
 			}
 		}
 	}
-	console.log("word", word)
+	// console.log("word", word)
 
 	function resetRow(row)
 	{
@@ -251,7 +251,7 @@ function App()
 		localStorage.removeItem("wordle-input-"+input.id)
 		input.classList.remove('typed')
 	}
-	function generateGrid()
+	const generateGrid = function ()
 	{
 		return ([...Array(5)].map((x, i) => {
 			const rowValues = [];
@@ -281,26 +281,24 @@ function App()
 		}
 		))
 	}
-	function updateGrid()
-	{
-		const grid = document.querySelector('.grid')
-		const clonegrid = grid.cloneNode()
-		grid.replaceWith(clonegrid)
-		createRoot(clonegrid).render(generateGrid())
-	}
-	function updateAttempCount()
-	{
-		const attemptsContainer = document.getElementById('attemptsContainer')
-		const cloneAttemptsContainer = attemptsContainer.cloneNode()
-		attemptsContainer.replaceWith(cloneAttemptsContainer)
-		createRoot(cloneAttemptsContainer).render(genAttempCount())
-	}
-	function genAttempCount()
+	
+	const genAttempCount = function ()
 	{
 		return (<h4>
 			Attempts: <span>{attemptCount}</span>
 			</h4>
 		);
+	}
+	const genKeyboard = function ()
+	{
+		return <Keyboard incorrects={incorrectLetters}/>
+	}
+	function refreshComponent(id, callback)
+	{
+		const container = document.getElementById(id)
+		const clonecontainer = container.cloneNode()
+		container.replaceWith(clonecontainer)
+		createRoot(clonecontainer).render(callback())
 	}
 	useEffect(()=>{
 		window.addEventListener('keydown', handleTyping)
@@ -312,7 +310,7 @@ function App()
 			<div id='attemptsContainer'>
 				{genAttempCount()}
 			</div>
-			<div className='grid'>
+			<div id = 'grid' className='grid'>
 				{generateGrid()}
 			</div>
 			<button  className="restart" type="button" onClick={() => newGame()}>
@@ -320,7 +318,9 @@ function App()
 					<path d="M18.364 8.05026L17.6569 7.34315C14.5327 4.21896 9.46734 4.21896 6.34315 7.34315C3.21895 10.4673 3.21895 15.5327 6.34315 18.6569C9.46734 21.7811 14.5327 21.7811 17.6569 18.6569C19.4737 16.84 20.234 14.3668 19.9377 12.0005M18.364 8.05026H14.1213M18.364 8.05026V3.80762" stroke="#1C274C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
 				</svg>
 			</button>
-			<Keyboard/>
+			<div id = "keyboardContainer">
+				{genKeyboard()}
+			</div>
 		</div>
 	);
 }

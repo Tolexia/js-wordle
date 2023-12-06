@@ -1,7 +1,7 @@
 .swal2-popup{
     background-color: var(--bg);
 }
-.swal2-html-container
+body .swal2-popup .swal2-html-container
 {
     overflow: unset;
 }

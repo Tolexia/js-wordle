@@ -3,7 +3,7 @@ import {ReactComponent as Backspace} from '../Backspace.svg'
 import {ReactComponent as Enter} from '../Enter.svg'
 
 
-const Keyboard =  function ()
+const Keyboard =  function (props)
 {
     // var currentInput = window.currentInput
     const keyboardValues = [
@@ -27,6 +27,8 @@ const Keyboard =  function ()
                     let value = (keyboardLetter == "Backspace" ? <Backspace/> : (keyboardLetter == "Enter" ? <Enter/> : keyboardLetter ) )
                     if(keyboardLetter.length > 1)
                         className += " extended"
+                    if(props.incorrects.includes(value))
+                        className += " incorrect"
                     return (
                     <button key={j} className={className} onClick={() => clickKeyboardButton(keyboardLetter)}>
                         {value}

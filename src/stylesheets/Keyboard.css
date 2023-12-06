@@ -17,9 +17,14 @@
     width: min(3em, calc(90vw / 10 - var(--marginButtons)));
     height: 4.5em;
     border-radius: 4px;
+    font-weight: bold;
+    border: none;
 }
 .keyboard-button.extended{
     width: min(calc(6em + var(--marginButtons)), calc(90vw / 5 - var(--marginButtons)));
+}
+.keyboard-button.incorrect{
+    opacity: .5;
 }
 .keyboard-button:not(:last-child)
 {
