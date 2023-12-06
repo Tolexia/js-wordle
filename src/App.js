@@ -11,7 +11,7 @@ function App()
 {
 	var currentInput, currentRow
 	var word = localStorage.getItem("currentWord")
-	var attemptCount = localStorage.getItem("wordle-attemptCount") != null ? localStorage.getItem("wordle-attemptCount") : 0
+	var attemptCount = localStorage.getItem("wordle-attemptCount") != null ? parseInt(localStorage.getItem("wordle-attemptCount")) : 0
 	var incorrectLetters = localStorage.getItem("wordle-incorrectLetters") != null ? JSON.parse(localStorage.getItem("wordle-incorrectLetters")) : []
 	
 	if(word == null)
@@ -121,6 +121,7 @@ function App()
 				attemptCount += 1
 				localStorage.setItem("wordle-attemptCount", attemptCount)
 				updateAttempCount()
+				currentRow.classList.add('over')
 				setRowColors(currentRow)
 				if(selection == word)
 				{
@@ -128,7 +129,6 @@ function App()
 				}
 				else
 				{
-					currentRow.classList.add('over')
 					currentInput = getTargetInput(true)
 					if(!currentInput)
 					{
@@ -176,15 +176,33 @@ function App()
 	function setAlmostsAndIncorrects(row)
 	{
 		const rowInputs = row.getElementsByTagName('input')
+		// console.log("row", row);
 		for (let index = 0; index < rowInputs.length; index++) {
 			const input = rowInputs[index];
+			// console.log("input.value", input.value);
 			if(input.value != "")
 			{
 				if(word.includes(input.value))
 				{
-					let corrects = row.querySelectorAll(`.correct[value="${input.value}"]`)
-					let almosts = row.querySelectorAll(`.almost[value="${input.value}"]`)
+					let corrects = row.querySelectorAll(`.correct`)
+					let almosts = row.querySelectorAll(`.almost`)
 					let countThisLetter = 0
+					let countCorrects = 0
+					let countAlmosts = 0
+					for (let index = 0; index < corrects.length; index++) 
+					{
+						const correct = corrects[index];
+						if(input.value == correct.value)
+							countCorrects++
+						
+					}
+					for (let index = 0; index < almosts.length; index++) 
+					{
+						const almost = almosts[index];
+						if(input.value == almost.value)
+							countAlmosts++
+						
+					}
 					for (let wordIndex = 0; wordIndex < word.length; wordIndex++) 
 					{
 						const wordLetter = word[wordIndex];
@@ -192,8 +210,10 @@ function App()
 							countThisLetter++
 						
 					}
-					
-					if((corrects.length + almosts.length) < countThisLetter && !input.classList.contains("correct") && !input.classList.contains("almost"))
+					// console.log("countThisLetter", countThisLetter);
+					// console.log("countCorrects", countCorrects);
+					// console.log("countAlmosts", countAlmosts);
+					if((countCorrects + countAlmosts) < countThisLetter && !input.classList.contains("correct") && !input.classList.contains("almost"))
 					{
 						input.className += " almost"
 					}

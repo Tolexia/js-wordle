@@ -16,13 +16,15 @@
     text-transform: uppercase;
     width: min(3em, calc(90vw / 10 - var(--marginButtons)));
     height: 4.5em;
+    border-radius: 4px;
 }
 .keyboard-button.extended{
-    width: min(6em, calc(90vw / 5));
+    width: min(calc(6em + var(--marginButtons)), calc(90vw / 5 - var(--marginButtons)));
 }
 .keyboard-button:not(:last-child)
 {
     margin-right: var(--marginButtons);
+    margin-bottom:  var(--marginButtons);
 }
 
 .keyboard svg g, .keyboard svg path {
