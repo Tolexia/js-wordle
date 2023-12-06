@@ -8,10 +8,10 @@ const Stats = function(props)
         if(data[key] > maxStat)
             maxStat = data[key]
     });
-    console.log("data", data)
+    
     return (
         <div>
-            <p>Word : {props.word}</p>
+            <p>Mot : {props.word[0].toUpperCase()+props.word.slice(1)}</p>
             <div className='stats-container'>
                 {
                     [...Array(5)].map((x, i) => 

@@ -48,6 +48,7 @@ function App()
 	const handleTyping = function (e){
 		if(e.key == "Enter")
 		{
+			e.preventDefault()
 			validateSelection()
 		}
 		else if(e.key == "Backspace")
@@ -147,7 +148,7 @@ function App()
 		const previousGames = (localStorage.getItem('wordle-stats') != null ? JSON.parse(localStorage.getItem('wordle-stats')) : {})
 		typeof previousGames[attemptCount] != "undefined" ? previousGames[attemptCount] += 1 : previousGames[attemptCount] = 1;
 		localStorage.setItem('wordle-stats', JSON.stringify(previousGames))
-		// alert(result)
+		
 		const MySwal = withReactContent(Swal)
 		MySwal.fire({
 			title: "Stats",
@@ -157,7 +158,8 @@ function App()
 	function setRowColors(row)
 	{
 		setCorrects(row)
-		setAlmostsAndIncorrects(row)
+		setAlmosts(row)
+		setIncorrects(row)
 	}
 	function setCorrects(row)
 	{
@@ -173,7 +175,22 @@ function App()
 			}
 		}
 	}
-	function setAlmostsAndIncorrects(row)
+	function setIncorrects(row)
+	{
+		const rowInputs = row.getElementsByTagName('input')
+		for (let index = 0; index < rowInputs.length; index++) {
+			const input = rowInputs[index];
+			if(input.value != "")
+			{
+				if(!incorrectLetters.includes(input.value))
+				{
+					incorrectLetters.push(input.value)
+					localStorage.setItem('incorrectLetters', JSON.stringify(incorrectLetters))
+				}
+			}
+		}
+	}
+	function setAlmosts(row)
 	{
 		const rowInputs = row.getElementsByTagName('input')
 		// console.log("row", row);
@@ -216,13 +233,6 @@ function App()
 					if((countCorrects + countAlmosts) < countThisLetter && !input.classList.contains("correct") && !input.classList.contains("almost"))
 					{
 						input.className += " almost"
-					}
-				}
-				else{
-					if(!incorrectLetters.includes(input.value))
-					{
-						incorrectLetters.push(input.value)
-						localStorage.setItem('incorrectLetters', JSON.stringify(incorrectLetters))
 					}
 				}
 			}

@@ -1,11 +1,15 @@
 .swal2-popup{
     background-color: var(--bg);
 }
+.swal2-html-container
+{
+    overflow: unset;
+}
 .stats-container{
-    height: 100% ;
+    min-height: 100% ;
     width: 90% ;
     border-left: 1px solid var(--color);
-    min-height: fit-content;
+    height: max-content;
     margin-left: 1em;
 }
 
