@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import words from './data/data.json'
+// import words from './data/data.json'
 import './App.css';
 import { createRoot , Root} from 'react-dom/client';
 import  Keyboard  from "./components/Keyboard";
@@ -9,11 +9,27 @@ import Stats from './components/Stats';
 
 function App() 
 {
+	var nb_min = localStorage.getItem('wordle-nb_min') ? parseInt(localStorage.getItem('wordle-nb_min')) : 4
+	var nb_max = localStorage.getItem('wordle-nb_max') ? parseInt(localStorage.getItem('wordle-nb_max')) : 10
+	var words = []
 	var currentInput, currentRow
 	var word = localStorage.getItem("currentWord")
 	var attemptCount = localStorage.getItem("wordle-attemptCount") != null ? parseInt(localStorage.getItem("wordle-attemptCount")) : 1
 	var incorrectLetters = localStorage.getItem("wordle-incorrectLetters") != null ? JSON.parse(localStorage.getItem("wordle-incorrectLetters")) : []
 	
+	function genWordsData()
+	{
+		words = []
+		const importWords = async (number) => {
+			const data = await import(`./data/francais_${number}.json`);
+			words = words.concat(data)
+		};
+		for (let i = nb_min; i < (nb_max - nb_min); i++) {
+			
+			importWords(i);
+		}
+	}
+	genWordsData()
 	if(word == null)
 	{
 		word = getNewWord()
@@ -28,6 +44,7 @@ function App()
 	}
 	function newGame()
 	{
+		genWordsData()
 		word = getNewWord()
 		for(let key in localStorage)
 		{
@@ -285,10 +302,16 @@ function App()
 	
 	const genAttempCount = function ()
 	{
-		return (<h4>
-			Essai: <span>{attemptCount}</span>
-			</h4>
-		);
+		if(attemptCount <= 5)
+		{
+			return (<h4>
+				Essai: <span>{attemptCount}</span>
+				</h4>
+			);
+		}
+		else{
+			return (<h4>Perdu</h4>)
+		}
 	}
 	const genKeyboard = function ()
 	{
@@ -308,17 +331,31 @@ function App()
 	}, [])
 	return (
 		<div id='App' className="App" style={{'--wordlength': word.length}}>
-			<div id='attemptsContainer'>
-				{genAttempCount()}
+			<div style={{display:"flex"}}>
+				<button  className="restart" type="button" onClick={() => newGame()}>
+					<svg width="3em" height="3em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path d="M18.364 8.05026L17.6569 7.34315C14.5327 4.21896 9.46734 4.21896 6.34315 7.34315C3.21895 10.4673 3.21895 15.5327 6.34315 18.6569C9.46734 21.7811 14.5327 21.7811 17.6569 18.6569C19.4737 16.84 20.234 14.3668 19.9377 12.0005M18.364 8.05026H14.1213M18.364 8.05026V3.80762" stroke="#1C274C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+					</svg>
+				</button>
+				<div>
+					<div className='range-container'>
+						<label style={{display:"block"}} htmlFor="range_min">Nb min. de lettres</label>
+						<input  id='range_min' type='range' min={4} max={10} defaultValue={nb_min} step={1} onChange={(event) => event.target.parentNode.getElementsByTagName("span")[0].innerText = event.target.value}/>
+						<span className='range_value'></span>
+					</div>
+					<div className='range-container'>
+						<label style={{display:"block"}} htmlFor="range_max">Nb max. de lettres</label>
+						<input  id='range_max' type='range' min={4} max={10} defaultValue={nb_max} step={1} onChange={(event) => event.target.parentNode.getElementsByTagName("span")[0].innerText = event.target.value}/>
+						<span className='range_value'></span>
+					</div>
+				</div>
 			</div>
 			<div id = 'grid' className='grid'>
 				{generateGrid()}
 			</div>
-			<button  className="restart" type="button" onClick={() => newGame()}>
-				<svg width="3em" height="3em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-					<path d="M18.364 8.05026L17.6569 7.34315C14.5327 4.21896 9.46734 4.21896 6.34315 7.34315C3.21895 10.4673 3.21895 15.5327 6.34315 18.6569C9.46734 21.7811 14.5327 21.7811 17.6569 18.6569C19.4737 16.84 20.234 14.3668 19.9377 12.0005M18.364 8.05026H14.1213M18.364 8.05026V3.80762" stroke="#1C274C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-				</svg>
-			</button>
+			<div id='attemptsContainer'>
+				{genAttempCount()}
+			</div>
 			<div id = "keyboardContainer">
 				{genKeyboard()}
 			</div>
