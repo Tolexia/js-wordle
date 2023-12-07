@@ -11,7 +11,7 @@ function App()
 {
 	var currentInput, currentRow
 	var word = localStorage.getItem("currentWord")
-	var attemptCount = localStorage.getItem("wordle-attemptCount") != null ? parseInt(localStorage.getItem("wordle-attemptCount")) : 0
+	var attemptCount = localStorage.getItem("wordle-attemptCount") != null ? parseInt(localStorage.getItem("wordle-attemptCount")) : 1
 	var incorrectLetters = localStorage.getItem("wordle-incorrectLetters") != null ? JSON.parse(localStorage.getItem("wordle-incorrectLetters")) : []
 	
 	if(word == null)
@@ -23,7 +23,6 @@ function App()
 	{
 		const newWord = words[Math.floor(Math.random()*words.length)];
 		localStorage.setItem("currentWord", newWord)
-		console.log("newWord", newWord)
 		document.getElementById("App").style = `--wordlength:${newWord.length}`
 		return newWord;
 	}
@@ -38,7 +37,7 @@ function App()
 			}
 		}
 		// document.querySelectorAll('.row input').forEach(input => input.value = "")
-		attemptCount = 0
+		attemptCount = 1
 		incorrectLetters = []
 		refreshComponent('attemptsContainer', genAttempCount)
 		refreshComponent('grid', generateGrid)
@@ -121,21 +120,21 @@ function App()
 			}
 			else
 			{
-				attemptCount += 1
-				localStorage.setItem("wordle-attemptCount", attemptCount)
-				refreshComponent('attemptsContainer', genAttempCount)
 				currentRow.classList.add('over')
 				setRowColors(currentRow)
 				if(selection == word)
 				{
-					gameOver('You won !')
+					gameOver('win')
 				}
 				else
 				{
+					attemptCount += 1
+					localStorage.setItem("wordle-attemptCount", attemptCount)
+					refreshComponent('attemptsContainer', genAttempCount)
 					currentInput = getTargetInput(true)
 					if(!currentInput)
 					{
-						gameOver('You lost... Try again !')
+						gameOver('lose')
 					}
 				}
 			}
@@ -148,7 +147,11 @@ function App()
 			localStorage.setItem('wordle-input-'+input.id, "")
 		})
 		const previousGames = (localStorage.getItem('wordle-stats') != null ? JSON.parse(localStorage.getItem('wordle-stats')) : {})
-		typeof previousGames[attemptCount] != "undefined" ? previousGames[attemptCount] += 1 : previousGames[attemptCount] = 1;
+		if(result == "win")
+			typeof previousGames[attemptCount] != "undefined" ? previousGames[attemptCount] += 1 : previousGames[attemptCount] = 1;
+		else
+			typeof previousGames["loss"] != "undefined" ? previousGames["loss"] += 1 : previousGames["loss"] = 1;
+
 		localStorage.setItem('wordle-stats', JSON.stringify(previousGames))
 		
 		const MySwal = withReactContent(Swal)
@@ -196,10 +199,8 @@ function App()
 	function setAlmosts(row)
 	{
 		const rowInputs = row.getElementsByTagName('input')
-		// console.log("row", row);
 		for (let index = 0; index < rowInputs.length; index++) {
 			const input = rowInputs[index];
-			// console.log("input.value", input.value);
 			if(input.value != "")
 			{
 				if(word.includes(input.value))
@@ -285,7 +286,7 @@ function App()
 	const genAttempCount = function ()
 	{
 		return (<h4>
-			Attempts: <span>{attemptCount}</span>
+			Essai: <span>{attemptCount}</span>
 			</h4>
 		);
 	}

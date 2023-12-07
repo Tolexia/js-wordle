@@ -16,16 +16,21 @@ const Stats = function(props)
                 {
                     [...Array(5)].map((x, i) => 
                     {
-                        const value = (typeof data[i] != "undefined" ? data[i] : 0)
+                        let index = i+1
+                        const value = (typeof data[index] != "undefined" ? data[index] : 0)
                         return (
-                        <div className='stats-row' key={i} style={{width:`calc( 100% * ${value} / ${maxStat} )`}}>
-                            <span className='stat-key'>{i+1}</span>
+                        <div className='stats-row' key={index} style={{width:`calc( 100% * ${value} / ${maxStat} )`}}>
+                            <span className='stat-key'>{index}</span>
                             <span className='stat-value'>{value}</span>
                         </div>
                         )
                     }
                     )
                 }
+                <div className='stats-row' key={"loss"} style={{width:`calc( 100% * ${data["loss"]} / ${maxStat} )`}}>
+                    <span className='stat-key' style={{left:"-1.5em"}}>&#128128;</span>
+                    <span className='stat-value'>{data["loss"]}</span>
+                </div>
             </div>
         </div>
     );

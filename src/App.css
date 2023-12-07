@@ -78,6 +78,10 @@ html, body, #root, .App {
 .restart path{
   stroke: var(--color);
 }
+.restart:hover path{
+  stroke: white;
+  filter: drop-shadow(0 0 1px white);
+}
 
 @media screen and (min-width:1200px) {
   .App{

@@ -20,6 +20,9 @@
     font-weight: bold;
     border: none;
 }
+.keyboard-button:hover{
+    filter: brightness(2);
+}
 .keyboard-button.extended{
     width: min(calc(6em + var(--marginButtons)), calc(90vw / 5 - var(--marginButtons)));
 }
