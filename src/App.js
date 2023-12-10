@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-// import words from './data/data.json'
+import wordsForGen from './data/data.json'
 import './App.css';
 import { createRoot , Root} from 'react-dom/client';
 import  Keyboard  from "./components/Keyboard";
@@ -11,41 +11,62 @@ function App()
 {
 	var nb_min = localStorage.getItem('wordle-nb_min') ? parseInt(localStorage.getItem('wordle-nb_min')) : 4
 	var nb_max = localStorage.getItem('wordle-nb_max') ? parseInt(localStorage.getItem('wordle-nb_max')) : 10
-	var words = []
+	var wordsForTest = []
 	var currentInput, currentRow
 	var word = localStorage.getItem("currentWord")
 	var attemptCount = localStorage.getItem("wordle-attemptCount") != null ? parseInt(localStorage.getItem("wordle-attemptCount")) : 1
 	var incorrectLetters = localStorage.getItem("wordle-incorrectLetters") != null ? JSON.parse(localStorage.getItem("wordle-incorrectLetters")) : []
+	var hasWon = localStorage.getItem("wordle-hasWon") != null ? localStorage.getItem("wordle-hasWon") : false
+	console.log("hasWon", hasWon)
 	
-	function genWordsData()
+	async function genWordsData(genNewWord = false)
 	{
-		words = []
+		wordsForTest = []
 		const importWords = async (number) => {
-			const data = await import(`./data/francais_${number}.json`);
-			words = words.concat(data)
+			const data = await require(`./data/francais_${number}.json`);
+			console.log("data", data)
+			wordsForTest = wordsForTest.concat(data)
+			console.log("wordsForTest", wordsForTest)
+
 		};
-		for (let i = nb_min; i < (nb_max - nb_min); i++) {
+		for (let i = nb_min; i <= nb_max; i++) {
 			
-			importWords(i);
+			await importWords(i);
 		}
+		if(genNewWord)
+			word = getNewWord()
+
 	}
-	genWordsData()
-	if(word == null)
-	{
-		word = getNewWord()
-	}
+	const mustGenNewWord = word == null
+	genWordsData(mustGenNewWord)
 	
 	function getNewWord()
 	{
-		const newWord = words[Math.floor(Math.random()*words.length)];
+		const randomValue = Math.floor(Math.random()*wordsForGen.length)
+		let newWord = wordsForGen[randomValue];
+		if(!(newWord.length >= nb_min && newWord.length <= nb_max))
+		{
+			newWord = null
+			const newRandomValue = (randomValue < (0.8*wordsForGen.length) ? randomValue : Math.floor(Math.random()* (0.8*wordsForGen.length)))
+			for (let index = newRandomValue; index < wordsForGen.length; index++) {
+				const wordTmp = wordsForGen[index];
+				if(wordTmp.length >= nb_min && wordTmp.length <= nb_max)
+				{
+					newWord = wordTmp
+					break
+				}
+			}
+		}
+		if(newWord == null)
+			newWord = getNewWord()
+		console.log("newWord", newWord)
 		localStorage.setItem("currentWord", newWord)
 		document.getElementById("App").style = `--wordlength:${newWord.length}`
 		return newWord;
 	}
-	function newGame()
+	async function newGame()
 	{
-		genWordsData()
-		word = getNewWord()
+		await genWordsData(true)
 		for(let key in localStorage)
 		{
 			if(key.includes('wordle-input') || key.includes('wordle-attemptCount') || key.includes('wordle-incorrectLetters'))
@@ -54,6 +75,8 @@ function App()
 			}
 		}
 		// document.querySelectorAll('.row input').forEach(input => input.value = "")
+		hasWon = false
+		localStorage.setItem("wordle-hasWon", hasWon)
 		attemptCount = 1
 		incorrectLetters = []
 		refreshComponent('attemptsContainer', genAttempCount)
@@ -125,13 +148,13 @@ function App()
 		{
 			currentRow = (document.querySelector('.row:not(.over)'))
 		}
-		
+		console.log("wordsForTest", wordsForTest)
 		if(currentRow != null)
 		{
 			let selection = "";
 			const inputsInRow = currentRow.querySelectorAll('input')
 			inputsInRow.forEach(input => selection += input.value)
-			if(selection.length < word.length || !words.includes(selection))
+			if(selection.length < word.length || !wordsForTest.includes(selection))
 			{
 				resetRow(currentRow)
 			}
@@ -164,8 +187,12 @@ function App()
 			localStorage.setItem('wordle-input-'+input.id, "")
 		})
 		const previousGames = (localStorage.getItem('wordle-stats') != null ? JSON.parse(localStorage.getItem('wordle-stats')) : {})
-		if(result == "win")
+		if(result == "win"){
 			typeof previousGames[attemptCount] != "undefined" ? previousGames[attemptCount] += 1 : previousGames[attemptCount] = 1;
+			hasWon = true
+			localStorage.setItem("wordle-hasWon", hasWon)
+			genAttempCount()
+		}
 		else
 			typeof previousGames["loss"] != "undefined" ? previousGames["loss"] += 1 : previousGames["loss"] = 1;
 
@@ -302,7 +329,10 @@ function App()
 	
 	const genAttempCount = function ()
 	{
-		if(attemptCount <= 5)
+		if(hasWon == true){
+			return (<h4>Gagné</h4>)
+		}
+		else if(attemptCount <= 5)
 		{
 			return (<h4>
 				Essai: <span>{attemptCount}</span>
@@ -324,6 +354,16 @@ function App()
 		container.replaceWith(clonecontainer)
 		createRoot(clonecontainer).render(callback())
 	}
+	function handleChangeRangeInput(event, refName)
+	{
+		event.target.parentNode.getElementsByTagName("span")[0].innerText = event.target.value;
+		const refValue = event.target.value
+		localStorage.setItem("wordle-"+refName, refValue)
+		if(refName == "nb_min")
+			nb_min = refValue
+		else if(refName == "nb_max")
+			nb_max = refValue
+	}
 	useEffect(()=>{
 		window.addEventListener('keydown', handleTyping)
 		const rows = document.querySelectorAll('.grid .row.over')
@@ -331,25 +371,23 @@ function App()
 	}, [])
 	return (
 		<div id='App' className="App" style={{'--wordlength': word.length}}>
-			<div style={{display:"flex"}}>
-				<button  className="restart" type="button" onClick={() => newGame()}>
-					<svg width="3em" height="3em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-						<path d="M18.364 8.05026L17.6569 7.34315C14.5327 4.21896 9.46734 4.21896 6.34315 7.34315C3.21895 10.4673 3.21895 15.5327 6.34315 18.6569C9.46734 21.7811 14.5327 21.7811 17.6569 18.6569C19.4737 16.84 20.234 14.3668 19.9377 12.0005M18.364 8.05026H14.1213M18.364 8.05026V3.80762" stroke="#1C274C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-					</svg>
-				</button>
-				<div>
-					<div className='range-container'>
-						<label style={{display:"block"}} htmlFor="range_min">Nb min. de lettres</label>
-						<input  id='range_min' type='range' min={4} max={10} defaultValue={nb_min} step={1} onChange={(event) => event.target.parentNode.getElementsByTagName("span")[0].innerText = event.target.value}/>
-						<span className='range_value'></span>
-					</div>
-					<div className='range-container'>
-						<label style={{display:"block"}} htmlFor="range_max">Nb max. de lettres</label>
-						<input  id='range_max' type='range' min={4} max={10} defaultValue={nb_max} step={1} onChange={(event) => event.target.parentNode.getElementsByTagName("span")[0].innerText = event.target.value}/>
-						<span className='range_value'></span>
-					</div>
+			<div className='range-container'>
+				<div className='range-item'>
+					<label style={{}} htmlFor="range_min">Nb min. de lettres</label>
+					<input  id='range_min' type='range' min={4} max={10} defaultValue={nb_min} step={1} onChange={(event) => handleChangeRangeInput(event, 'nb_min')}/>
+					<span className='range_value'>{nb_min}</span>
+				</div>
+				<div className='range-item'>
+					<label style={{}} htmlFor="range_max">Nb max. de lettres</label>
+					<input  id='range_max' type='range' min={4} max={10} defaultValue={nb_max} step={1} onChange={(event) => handleChangeRangeInput(event, 'nb_max')}/>
+					<span className='range_value'>{nb_max}</span>
 				</div>
 			</div>
+			<button  className="restart" type="button" onClick={() => newGame()}>
+				<svg width="3em" height="3em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path d="M18.364 8.05026L17.6569 7.34315C14.5327 4.21896 9.46734 4.21896 6.34315 7.34315C3.21895 10.4673 3.21895 15.5327 6.34315 18.6569C9.46734 21.7811 14.5327 21.7811 17.6569 18.6569C19.4737 16.84 20.234 14.3668 19.9377 12.0005M18.364 8.05026H14.1213M18.364 8.05026V3.80762" stroke="#1C274C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+				</svg>
+			</button>
 			<div id = 'grid' className='grid'>
 				{generateGrid()}
 			</div>

@@ -74,6 +74,7 @@ html, body, #root, .App {
 .restart{
   border: none;
   background: transparent;
+  margin-bottom: 1em;
 }
 .restart path{
   stroke: var(--color);
@@ -82,7 +83,19 @@ html, body, #root, .App {
   stroke: white;
   filter: drop-shadow(0 0 1px white);
 }
-
+.range-container{
+  display: flex;
+}
+.range-item{
+  margin-left: 2em;
+  margin-right: 2em;
+}
+.range-item label {
+  display:block;
+}
+.range-item input {
+  margin-right: 1em;
+}
 @media screen and (min-width:1200px) {
   .App{
     min-height: 100vh;
