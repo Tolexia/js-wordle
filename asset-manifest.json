@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "/react-wordle/static/css/main.d360512b.css",
-    "main.js": "/react-wordle/static/js/main.f38e24e4.js",
+    "main.css": "/react-wordle/static/css/main.2ec64a9a.css",
+    "main.js": "/react-wordle/static/js/main.33b5a04a.js",
     "static/js/787.8aa02c52.chunk.js": "/react-wordle/static/js/787.8aa02c52.chunk.js",
     "static/media/Backspace.svg": "/react-wordle/static/media/Backspace.0e32b331c978342c287ad92d69bc941e.svg",
     "index.html": "/react-wordle/index.html",
     "static/media/Enter.svg": "/react-wordle/static/media/Enter.f275600f11db4c4d31e386dafdb1ff55.svg",
-    "main.d360512b.css.map": "/react-wordle/static/css/main.d360512b.css.map",
-    "main.f38e24e4.js.map": "/react-wordle/static/js/main.f38e24e4.js.map",
+    "main.2ec64a9a.css.map": "/react-wordle/static/css/main.2ec64a9a.css.map",
+    "main.33b5a04a.js.map": "/react-wordle/static/js/main.33b5a04a.js.map",
     "787.8aa02c52.chunk.js.map": "/react-wordle/static/js/787.8aa02c52.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.d360512b.css",
-    "static/js/main.f38e24e4.js"
+    "static/css/main.2ec64a9a.css",
+    "static/js/main.33b5a04a.js"
   ]
 }
