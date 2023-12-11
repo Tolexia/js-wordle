@@ -16,6 +16,7 @@ function App()
 	var word = localStorage.getItem("currentWord")
 	var attemptCount = localStorage.getItem("wordle-attemptCount") != null ? parseInt(localStorage.getItem("wordle-attemptCount")) : 1
 	var incorrectLetters = localStorage.getItem("wordle-incorrectLetters") != null ? JSON.parse(localStorage.getItem("wordle-incorrectLetters")) : []
+	var correctLetters = localStorage.getItem("wordle-correctLetters") != null ? JSON.parse(localStorage.getItem("wordle-correctLetters")) : {}
 	var hasWon = localStorage.getItem("wordle-hasWon") != null ? localStorage.getItem("wordle-hasWon") : false
 	console.log("hasWon", hasWon)
 	
@@ -69,7 +70,7 @@ function App()
 		await genWordsData(true)
 		for(let key in localStorage)
 		{
-			if(key.includes('wordle-input') || key.includes('wordle-attemptCount') || key.includes('wordle-incorrectLetters'))
+			if(key.includes('wordle-input') || key.includes('wordle-attemptCount') || key.includes('wordle-incorrectLetters') || key.includes('wordle-correctLetters'))
 			{
 				localStorage.removeItem(key)
 			}
@@ -161,6 +162,7 @@ function App()
 			{
 				currentRow.classList.add('over')
 				setRowColors(currentRow)
+				// refreshComponent('grid', generateGrid)
 				if(selection == word)
 				{
 					gameOver('win')
@@ -220,6 +222,11 @@ function App()
 				if(input.value == word[index] && !input.classList.contains("correct"))
 				{
 					input.className += " correct"
+					if(!correctLetters.includes(input.value))
+					{
+						correctLetters[index] = input.value
+						localStorage.setItem('wordle-correctLetters', JSON.stringify(correctLetters))
+					}
 				}
 			}
 		}
@@ -297,6 +304,7 @@ function App()
 	}
 	const generateGrid = function ()
 	{
+		// console.log("correctLetters", correctLetters);
 		return ([...Array(5)].map((x, i) => {
 			const rowValues = [];
 			for (let rowKey = 0; rowKey < word.length; rowKey++) {
@@ -313,6 +321,7 @@ function App()
 					return (
 						<input key={j} id={i+'-'+j} 
 							maxLength={1} pattern='[a-zA-Z]' type='text' 
+							placeholder={value == null && typeof correctLetters[j] != "undefined" && correctLetters[j] == word[j] ? word[j] : ""}
 							className={className}
 							value={value != null ? value : ""} 
 							onChange={()=>{}}
@@ -355,12 +364,12 @@ function App()
 	}
 	function handleChangeRangeInput(event, refName)
 	{
-		let refValue = event.target.value
+		let refValue = parseInt(event.target.value)
 		if(refName == "nb_min" && refValue > nb_max || refName == "nb_max" && refValue < nb_min)
 		{
 			event.preventDefault()
 			event.target.value = nb_min = nb_max 
-			refValue = event.target.value
+			refValue = parseInt(event.target.value)
 		}
 		else if(refName == "nb_min")
 			nb_min = refValue
