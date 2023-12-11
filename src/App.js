@@ -17,6 +17,7 @@ function App()
 	var attemptCount = localStorage.getItem("wordle-attemptCount") != null ? parseInt(localStorage.getItem("wordle-attemptCount")) : 1
 	var incorrectLetters = localStorage.getItem("wordle-incorrectLetters") != null ? JSON.parse(localStorage.getItem("wordle-incorrectLetters")) : []
 	var correctLetters = localStorage.getItem("wordle-correctLetters") != null ? JSON.parse(localStorage.getItem("wordle-correctLetters")) : {}
+	console.log("correctLetters", correctLetters)
 	var hasWon = localStorage.getItem("wordle-hasWon") != null ? localStorage.getItem("wordle-hasWon") : false
 	console.log("hasWon", hasWon)
 	
@@ -79,6 +80,7 @@ function App()
 		localStorage.setItem("wordle-hasWon", hasWon)
 		attemptCount = 1
 		incorrectLetters = []
+		correctLetters = {}
 		refreshComponent('attemptsContainer', genAttempCount)
 		refreshComponent('grid', generateGrid)
 		refreshComponent('keyboardContainer', genKeyboard)
@@ -162,7 +164,6 @@ function App()
 			{
 				currentRow.classList.add('over')
 				setRowColors(currentRow)
-				// refreshComponent('grid', generateGrid)
 				if(selection == word)
 				{
 					gameOver('win')
@@ -211,6 +212,17 @@ function App()
 		setAlmosts(row)
 		setIncorrects(row)
 		refreshComponent('keyboardContainer', genKeyboard)
+		setPlaceholders()
+	}
+	function setPlaceholders(){
+		document.querySelectorAll('.grid .row.over + .row:not(.over)').forEach(row => {
+			const inputs = row.getElementsByTagName("input")
+			for (let index = 0; index < inputs.length; index++) {
+				const input = inputs[index];
+				if(typeof correctLetters[index] != "undefined")
+					input.placeholder = correctLetters[index]
+			}
+		})
 	}
 	function setCorrects(row)
 	{
@@ -222,11 +234,8 @@ function App()
 				if(input.value == word[index] && !input.classList.contains("correct"))
 				{
 					input.className += " correct"
-					if(!correctLetters.includes(input.value))
-					{
-						correctLetters[index] = input.value
-						localStorage.setItem('wordle-correctLetters', JSON.stringify(correctLetters))
-					}
+					correctLetters[index] = input.value
+					localStorage.setItem('wordle-correctLetters', JSON.stringify(correctLetters))
 				}
 			}
 		}
