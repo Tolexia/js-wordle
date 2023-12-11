@@ -355,13 +355,20 @@ function App()
 	}
 	function handleChangeRangeInput(event, refName)
 	{
-		event.target.parentNode.getElementsByTagName("span")[0].innerText = event.target.value;
-		const refValue = event.target.value
-		localStorage.setItem("wordle-"+refName, refValue)
-		if(refName == "nb_min")
+		let refValue = event.target.value
+		if(refName == "nb_min" && refValue > nb_max || refName == "nb_max" && refValue < nb_min)
+		{
+			event.preventDefault()
+			event.target.value = nb_min = nb_max 
+			refValue = event.target.value
+		}
+		else if(refName == "nb_min")
 			nb_min = refValue
 		else if(refName == "nb_max")
 			nb_max = refValue
+
+		event.target.parentNode.getElementsByTagName("span")[0].innerText = refValue;
+		localStorage.setItem("wordle-"+refName, refValue)
 	}
 	useEffect(()=>{
 		window.addEventListener('keydown', handleTyping)
