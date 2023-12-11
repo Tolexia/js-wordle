@@ -24,9 +24,9 @@ function App()
 		wordsForTest = []
 		const importWords = async (number) => {
 			const data = await require(`./data/francais_${number}.json`);
-			console.log("data", data)
+			// console.log("data", data)
 			wordsForTest = wordsForTest.concat(data)
-			console.log("wordsForTest", wordsForTest)
+			// console.log("wordsForTest", wordsForTest)
 
 		};
 		for (let i = nb_min; i <= nb_max; i++) {
@@ -44,13 +44,13 @@ function App()
 	{
 		const randomValue = Math.floor(Math.random()*wordsForGen.length)
 		let newWord = wordsForGen[randomValue];
-		if(!(newWord.length >= nb_min && newWord.length <= nb_max))
+		if(!(newWord.length >= nb_min && newWord.length <= nb_max && wordsForTest.includes(newWord)))
 		{
 			newWord = null
 			const newRandomValue = (randomValue < (0.8*wordsForGen.length) ? randomValue : Math.floor(Math.random()* (0.8*wordsForGen.length)))
 			for (let index = newRandomValue; index < wordsForGen.length; index++) {
 				const wordTmp = wordsForGen[index];
-				if(wordTmp.length >= nb_min && wordTmp.length <= nb_max)
+				if(wordTmp.length >= nb_min && wordTmp.length <= nb_max && wordsForTest.includes(wordTmp))
 				{
 					newWord = wordTmp
 					break
@@ -74,7 +74,6 @@ function App()
 				localStorage.removeItem(key)
 			}
 		}
-		// document.querySelectorAll('.row input').forEach(input => input.value = "")
 		hasWon = false
 		localStorage.setItem("wordle-hasWon", hasWon)
 		attemptCount = 1
@@ -191,7 +190,7 @@ function App()
 			typeof previousGames[attemptCount] != "undefined" ? previousGames[attemptCount] += 1 : previousGames[attemptCount] = 1;
 			hasWon = true
 			localStorage.setItem("wordle-hasWon", hasWon)
-			genAttempCount()
+			refreshComponent('attemptsContainer', genAttempCount)
 		}
 		else
 			typeof previousGames["loss"] != "undefined" ? previousGames["loss"] += 1 : previousGames["loss"] = 1;
