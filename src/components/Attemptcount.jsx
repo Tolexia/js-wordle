@@ -1,12 +1,14 @@
 import '../stylesheets/Attemptcount.css'
+// import { useState, useEffect } from 'react';
 
 const Attemptcount = function(props)
 {
     const attemptCount = props.attemptCount
-    const [hasWon, setHasWon] = useState(props.hasWon)
-    useEffect( () => {
-        setHasWon(props.hasWon);
-    }, [props.hasWon]); 
+    const hasWon = props.hasWon
+    // const [hasWon, setHasWon] = useState(props.hasWon)
+    // useEffect( () => {
+    //     setHasWon(props.hasWon);
+    // }, [props.hasWon]); 
     function getCount()
     {
         if(hasWon == true){

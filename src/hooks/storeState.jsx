@@ -1,4 +1,6 @@
-const storeState = (key, initialValue) => {
+import { useState } from 'react';
+
+const StoreState = (key, initialValue) => {
     const [storedValue, setStoredValue] = useState(() => {
       if (typeof window === "undefined") {
         return initialValue;
@@ -26,4 +28,4 @@ const storeState = (key, initialValue) => {
     return [storedValue, setValue];
   };
   
-  export default storeState;
+  export default StoreState;

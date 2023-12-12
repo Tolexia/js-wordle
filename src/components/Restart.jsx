@@ -2,15 +2,15 @@ import '../stylesheets/Restart.css'
 
 const Restart = function(props)
 {
-    const nb_min = props.nbmin
-    const nb_max = props.nbmax
+    let nb_min = props.nbmin
+    let nb_max = props.nbmax
     const setNb_min = props.setNb_min
     const setNb_max = props.setNb_max
     const newGame = props.newGame
     function handleChangeRangeInput(event, refName)
 	{
 		let refValue = parseInt(event.target.value)
-		if(refName == "nb_min" && refValue > nb_max || refName == "nb_max" && refValue < nb_min)
+		if((refName === "nb_min" && refValue > nb_max) || (refName === "nb_max" && refValue < nb_min))
 		{
 			event.preventDefault()
 			event.target.value = nb_min = nb_max 

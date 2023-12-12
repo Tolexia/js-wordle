@@ -6,7 +6,7 @@ import  Keyboard  from "./components/Keyboard";
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import Stats from './components/Stats';
-import storeState from './hooks/storeState';
+import StoreState from './hooks/StoreState'
 import Grid from './components/Grid';
 import Attemptcount from './components/Attemptcount';
 import Restart from './components/Restart';
@@ -14,19 +14,16 @@ import Restart from './components/Restart';
 function App() 
 {
 	var prefix = 'wordle-'
-	const [nb_min, setNb_min] = storeState(prefix+"nb_min", 4) 
-	const [nb_max, setNb_max] =  storeState(prefix+"nb_max", 10)
+	const [nb_min, setNb_min] = StoreState(prefix+"nb_min", 4) 
+	const [nb_max, setNb_max] =  StoreState(prefix+"nb_max", 10)
 	var wordsForTest = []
-	const [currentInput, setCurrentInput] = useState(null)
-	const [currentRow, setCurrentRow] = useState(null)
-	const [word, setWord] = storeState(prefix+"word", null) 
-	const [attemptCount, setAttemptCount] =  storeState(prefix+"attemptCount", 1)
-	const [incorrectLetters, setIncorrectLetters] =  storeState(prefix+"incorrectLetters", [])
-	const [correctLetters, setCorrectLetters] =  storeState(prefix+"correctLetters", {})
-	const [hasWon, setHasWon] =  storeState(prefix+"hasWon", false)
-	const [hasInit, sethasInit] =  storeState(prefix+"hasInit", false)
-	console.log("correctLetters", correctLetters)
-	console.log("hasWon", hasWon)
+	var currentInput = null
+	var currentRow = null
+	const [word, setWord] = StoreState(prefix+"word", "") 
+	const [attemptCount, setAttemptCount] =  StoreState(prefix+"attemptCount", 1)
+	const [incorrectLetters, setIncorrectLetters] =  StoreState(prefix+"incorrectLetters", [])
+	const [correctLetters, setCorrectLetters] =  StoreState(prefix+"correctLetters", {})
+	const [hasWon, setHasWon] =  StoreState(prefix+"hasWon", false)
 	
 	async function genWordsData(genNewWord = false)
 	{
@@ -45,11 +42,7 @@ function App()
 		if(genNewWord)
 			setWord(getNewWord())
 
-		sethasInit(true)
 	}
-	const mustGenNewWord = word == null
-	if(hasInit != true)
-		genWordsData(mustGenNewWord)
 	
 	function getNewWord()
 	{
@@ -92,10 +85,11 @@ function App()
 		// refreshComponent('grid', generateGrid)
 		// refreshComponent('keyboardContainer', genKeyboard)
 		document.querySelector('.restart').blur()
-		setCurrentInput(getTargetInput(true))
+		currentInput = getTargetInput(true)
 	}
 
 	const handleTyping = function (e){
+		console.log("handleTyping", e)
 		if(e.key == "Enter")
 		{
 			e.preventDefault()
@@ -108,14 +102,14 @@ function App()
 			{
 				const lastTypedInput = typedInputs[typedInputs.length-1]
 				resetInput(lastTypedInput)
-				setCurrentInput(lastTypedInput)
+				currentInput = (lastTypedInput)
 			}
 		}
 		else if(e.key.length == 1 && e.key.match(/[a-zA-Z]/))
 		{
 			if(currentInput == null)
 			{
-				setCurrentInput(getTargetInput())
+				currentInput = getTargetInput()
 			}
 
 			if(currentInput != null)
@@ -123,7 +117,7 @@ function App()
 				currentInput.value = e.key;
 				currentInput.classList.add('typed')
 				localStorage.setItem("wordle-input-"+currentInput.id, currentInput.value)
-				setCurrentInput(getTargetInput())
+				currentInput = getTargetInput()
 			}
 			
 		}
@@ -136,7 +130,7 @@ function App()
 	{
 		if(currentRow == null || forceNewRow)
 		{
-			setCurrentRow(document.querySelector('.row:not(.over)'))
+			currentRow = document.querySelector('.row:not(.over)')
 		}
 		if(currentRow != null)
 		{
@@ -155,7 +149,7 @@ function App()
 	{
 		if(currentRow == null)
 		{
-			setCurrentRow((document.querySelector('.row:not(.over)')))
+			currentRow = ((document.querySelector('.row:not(.over)')))
 		}
 		console.log("wordsForTest", wordsForTest)
 		if(currentRow != null)
@@ -179,7 +173,7 @@ function App()
 				{
 					setAttemptCount(attemptCount + 1)
 					// refreshComponent('attemptsContainer', genAttempCount)
-					setCurrentInput(getTargetInput(true))
+					currentInput =getTargetInput(true)
 					if(!currentInput)
 					{
 						gameOver('lose')
@@ -308,7 +302,7 @@ function App()
 	function resetRow(row)
 	{
 		row.querySelectorAll('input').forEach(input => resetInput(input))
-		setCurrentInput(getTargetInput())
+		currentInput = getTargetInput()
 	}
 	function resetInput(input)
 	{
@@ -316,70 +310,16 @@ function App()
 		localStorage.removeItem("wordle-input-"+input.id)
 		input.classList.remove('typed')
 	}
-	const generateGrid = function ()
-	{
-		// console.log("correctLetters", correctLetters);
-		return ([...Array(5)].map((x, i) => {
-			const rowValues = [];
-			for (let rowKey = 0; rowKey < word.length; rowKey++) {
-				let value = localStorage.getItem('wordle-input-'+i+'-'+rowKey);
-				if(value != null)
-					rowValues.push(value)
-			}
-			const rowClassname = rowValues.length == word.length ? "row over" : "row"
-			return (
-			<div className={rowClassname} key={i}>
-				{[...Array(word.length)].map((y, j) => {
-					let value = localStorage.getItem('wordle-input-'+i+'-'+j);
-					const className = (value != null ? "typed" : "")
-					return (
-						<input key={j} id={i+'-'+j} 
-							maxLength={1} pattern='[a-zA-Z]' type='text' 
-							placeholder={value == null && typeof correctLetters[j] != "undefined" && correctLetters[j] == word[j] ? word[j] : ""}
-							className={className}
-							value={value != null ? value : ""} 
-							onChange={()=>{}}
-						/>
-					)
-				}
-				)}
-			</div>
-			)
-		}
-		))
-	}
-	
-	const genAttempCount = function ()
-	{
-		if(hasWon == true){
-			return (<h4>Gagné</h4>)
-		}
-		else if(attemptCount <= 5)
-		{
-			return (<h4>
-				Essai: <span>{attemptCount}</span>
-				</h4>
-			);
-		}
-		else{
-			return (<h4>Perdu</h4>)
-		}
-	}
-	const genKeyboard = function ()
-	{
-		return <Keyboard incorrects={incorrectLetters}/>
-	}
-	function refreshComponent(id, callback)
-	{
-		const container = document.getElementById(id)
-		const clonecontainer = container.cloneNode()
-		container.replaceWith(clonecontainer)
-		createRoot(clonecontainer).render(callback())
-	}
 	
 	useEffect(()=>{
+		currentInput = getTargetInput()
+
+
+		const mustGenNewWord = word == null
+		genWordsData(mustGenNewWord)
 		window.removeEventListener('keydown', handleTyping)
 		window.addEventListener('keydown', handleTyping)
+		
 		const rows = document.querySelectorAll('.grid .row.over')
 		rows.forEach(row => setRowColors(row))
 	}, [])
@@ -387,7 +327,7 @@ function App()
 		<div id='App' className="App" style={{'--wordlength': word.length}}>
 				<Restart nbmin={nb_min} setNb_min={setNb_min} setNb_max={setNb_max} nbmax={nb_max} newGame={newGame}/>
 				<Grid word={word} correctLetters={correctLetters} />
-				<Attemptcount />
+				<Attemptcount attemptCount={attemptCount} hasWon={hasWon} />
 				<Keyboard incorrects={incorrectLetters}/>
 		</div>
 	);
