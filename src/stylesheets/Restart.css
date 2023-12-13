@@ -1,3 +1,8 @@
+.restart-container{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 .restart{
     border: none;
     background: transparent;

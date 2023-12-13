@@ -25,7 +25,7 @@ const Restart = function(props)
 		// localStorage.setItem("wordle-"+refName, refValue)
 	}
     return (
-        <div>
+        <div className='restart-container'>
             <div className='range-container'>
                 <div className='range-item'>
                     <label style={{}} htmlFor="range_min">Nb min. de lettres</label>

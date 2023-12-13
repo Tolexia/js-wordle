@@ -1,9 +1,12 @@
 import '../stylesheets/Grid.css'
-
+import { useEffect, useState } from 'react'
 const Grid = function(props)
 {
-    const word = props.word
+    const [word, setWord] = useState(props.word)
     const correctLetters = props.correctLetters
+    useEffect(() => {
+        setWord(props.word)
+    }, [props.word])
     return (
         <div id = 'grid' className='grid'>
             {[...Array(5)].map((x, i) => {
