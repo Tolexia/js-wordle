@@ -24,6 +24,7 @@ function App()
 	const [incorrectLetters, setIncorrectLetters] =  StoreState(prefix+"incorrectLetters", [])
 	const [correctLetters, setCorrectLetters] =  StoreState(prefix+"correctLetters", {})
 	const [hasWon, setHasWon] =  StoreState(prefix+"hasWon", false)
+	const [isValid, setIsValid] = useState(false)
 	
 	async function genWordsData(genNewWord = false)
 	{
@@ -160,14 +161,16 @@ function App()
 			if(selection.length < word.length || !wordsForTest.includes(selection))
 			{
 				resetRow(currentRow)
+				setIsValid(false)
 			}
 			else
 			{
 				currentRow.classList.add('over')
-				setRowColors(currentRow)
+				setIsValid(true)
 				if(selection == word)
 				{
 					gameOver('win')
+					setIsValid(false)
 				}
 				else
 				{
@@ -205,99 +208,8 @@ function App()
 			html: <Stats data = {previousGames} word={word}/>
 		})
 	}
-	function setRowColors(row)
-	{
-		setCorrects(row)
-		setAlmosts(row)
-		setIncorrects(row)
-		// refreshComponent('keyboardContainer', genKeyboard)
-		setPlaceholders()
-	}
-	function setPlaceholders(){
-		document.querySelectorAll('.grid .row.over + .row:not(.over)').forEach(row => {
-			const inputs = row.getElementsByTagName("input")
-			for (let index = 0; index < inputs.length; index++) {
-				const input = inputs[index];
-				if(typeof correctLetters[index] != "undefined")
-					input.placeholder = correctLetters[index]
-			}
-		})
-	}
-	function setCorrects(row)
-	{
-		const rowInputs = row.getElementsByTagName('input')
-		for (let index = 0; index < rowInputs.length; index++) {
-			const input = rowInputs[index];
-			if(input.value != "")
-			{
-				if(input.value == word[index] && !input.classList.contains("correct"))
-				{
-					input.className += " correct"
-					correctLetters[index] = input.value
-					localStorage.setItem('wordle-correctLetters', JSON.stringify(correctLetters))
-				}
-			}
-		}
-	}
-	function setIncorrects(row)
-	{
-		const rowInputs = row.getElementsByTagName('input')
-		for (let index = 0; index < rowInputs.length; index++) {
-			const input = rowInputs[index];
-			if(input.value != "")
-			{
-				if(!word.includes(input.value) && !incorrectLetters.includes(input.value))
-				{
-					incorrectLetters.push(input.value)
-					localStorage.setItem('wordle-incorrectLetters', JSON.stringify(incorrectLetters))
-				}
-			}
-		}
-	}
-	function setAlmosts(row)
-	{
-		const rowInputs = row.getElementsByTagName('input')
-		for (let index = 0; index < rowInputs.length; index++) {
-			const input = rowInputs[index];
-			if(input.value != "")
-			{
-				if(word.includes(input.value))
-				{
-					let corrects = row.querySelectorAll(`.correct`)
-					let almosts = row.querySelectorAll(`.almost`)
-					let countThisLetter = 0
-					let countCorrects = 0
-					let countAlmosts = 0
-					for (let index = 0; index < corrects.length; index++) 
-					{
-						const correct = corrects[index];
-						if(input.value == correct.value)
-							countCorrects++
-						
-					}
-					for (let index = 0; index < almosts.length; index++) 
-					{
-						const almost = almosts[index];
-						if(input.value == almost.value)
-							countAlmosts++
-						
-					}
-					for (let wordIndex = 0; wordIndex < word.length; wordIndex++) 
-					{
-						const wordLetter = word[wordIndex];
-						if(input.value == wordLetter)
-							countThisLetter++
-						
-					}
-					if((countCorrects + countAlmosts) < countThisLetter && !input.classList.contains("correct") && !input.classList.contains("almost"))
-					{
-						input.className += " almost"
-					}
-				}
-			}
-		}
-	}
-	// console.log("word", word)
+	
+	console.log("word", word)
 
 	function resetRow(row)
 	{
@@ -320,15 +232,22 @@ function App()
 		window.removeEventListener('keydown', handleTyping)
 		window.addEventListener('keydown', handleTyping)
 		
-		const rows = document.querySelectorAll('.grid .row.over')
-		rows.forEach(row => setRowColors(row))
 	}, [])
 	return (
 		<div id='App' className="App" style={{'--wordlength': word.length}}>
 				<Restart nbmin={nb_min} setNb_min={setNb_min} setNb_max={setNb_max} nbmax={nb_max} newGame={newGame}/>
-				<Grid word={word} correctLetters={correctLetters} />
+				<Grid 
+					word={word} 
+					correctLetters={correctLetters} 
+					incorrectLetters={incorrectLetters} 
+					setCorrectLetters={setCorrectLetters} 
+					setIncorrectLetters={setIncorrectLetters} 
+					currentRow={currentRow} 
+					currentInput={currentInput} 
+					isValid={isValid} 
+				/>
 				<Attemptcount attemptCount={attemptCount} hasWon={hasWon} />
-				<Keyboard incorrects={incorrectLetters}/>
+				<Keyboard incorrects={incorrectLetters} isValid={isValid}/>
 		</div>
 	);
 }

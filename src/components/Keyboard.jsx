@@ -1,10 +1,12 @@
 import "../stylesheets/Keyboard.css"
 import {ReactComponent as Backspace} from '../Backspace.svg'
 import {ReactComponent as Enter} from '../Enter.svg'
+import { useEffect, useState } from "react"
 
 
 const Keyboard =  function (props)
 {
+    const [isValid, setIsValid] = useState(props.isValid)
     // var currentInput = window.currentInput
     const keyboardValues = [
         ["a", "z", "e", "r", "t", "y", "u", "i", "o", "p"],
@@ -18,6 +20,9 @@ const Keyboard =  function (props)
         console.log("letter", letter)
         window.dispatchEvent(ev);
     }
+    useEffect(() => {
+        setIsValid(props.isValid)
+    }, [props.isValid])
     return (
         <div id = "keyboardContainer">
             <div className="keyboard">
