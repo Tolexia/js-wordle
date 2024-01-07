@@ -17,10 +17,8 @@ function App()
 	var attemptCount = localStorage.getItem("wordle-attemptCount") != null ? parseInt(localStorage.getItem("wordle-attemptCount")) : 1
 	var incorrectLetters = localStorage.getItem("wordle-incorrectLetters") != null ? JSON.parse(localStorage.getItem("wordle-incorrectLetters")) : []
 	var correctLetters = localStorage.getItem("wordle-correctLetters") != null ? JSON.parse(localStorage.getItem("wordle-correctLetters")) : {}
-	console.log("correctLetters", correctLetters)
 	var hasWon = localStorage.getItem("wordle-hasWon") != null ? localStorage.getItem("wordle-hasWon") : false
-	console.log("hasWon", hasWon)
-	
+
 	async function genWordsData(genNewWord = false)
 	{
 		wordsForTest = []
@@ -42,10 +40,12 @@ function App()
 	const mustGenNewWord = word == null
 	genWordsData(mustGenNewWord)
 	
-	function getNewWord()
+	function getNewWord(attemptCount = 0)
 	{
 		const randomValue = Math.floor(Math.random()*wordsForGen.length)
+		console.log("randomValue", randomValue)
 		let newWord = wordsForGen[randomValue];
+		console.log("wordsForGen[randomValue]", wordsForGen[randomValue])
 		if(!(newWord.length >= nb_min && newWord.length <= nb_max && wordsForTest.includes(newWord)))
 		{
 			newWord = null
@@ -59,8 +59,13 @@ function App()
 				}
 			}
 		}
-		if(newWord == null)
-			newWord = getNewWord()
+		console.log("newWord", newWord)
+		console.log("attemptCount", attemptCount)
+		if(newWord == null && attemptCount < 20)
+		{
+			attemptCount++;
+			newWord = getNewWord(attemptCount)
+		}
 		console.log("newWord", newWord)
 		localStorage.setItem("currentWord", newWord)
 		document.getElementById("App").style = `--wordlength:${newWord.length}`
