@@ -1,15 +1,48 @@
-# React wordle
- 
-My own wordle in React
+# React Wordle
 
+My own Wordle game in React, including the possibility to set up the word length and start new games at will.
 
-# Getting Started with Create React App
+It's in french only, but it is possible to convert it to any other language following these steps : 
+* You need to search the internet for at least one words list in your language, in the same format as /src/data/francais.txt
+In option, as I did for a better user-friendly experience, I in fact searched for two lists : 
+    - one with the most used words, for word generation,
+    - one with the maximum amount of words possible, for selection validation.
+The current code in App.js is oriented for this case, but I will detail how to update it to work with only one list.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+* The /src/data/data.json contains the most used words in my case and are stored in a variable called wordsForGen in App.js
+If you want the simplest version of a the game and use only one words list, you will work with this file only.
+- To create it from the .txt words list, you can execute the python script /src/data/genWordsListToFind.py and replace "francais.txt" by your .txt file name.
+- Once you have a data.json file, you will need to modify the App.js function genWordsData()
+    Change the lines : 
+        wordsForTest = []
+		const importWords = async (number) => {
+			const data = await require(`./data/francais_${number}.json`);
+			wordsForTest = wordsForTest.concat(data)
+		};
+    By : 
+    wordsForTest = wordsForGen
 
-## Available Scripts
+    It should make the deal by connecting the two variables into one.
+
+* If you want the Find/Validate system like in the current code, generate the data.json with the most used words list (previous step), then:
+-  Execute the genWordsListForValidation.py script on your exhaustive words list.
+It will ask you for the wanted word length, execute it for each word length you want, in this example from 4 to 10.
+- If you are a python connoisseur, it is surely possible to do it in one script, looping on the file and filling json files by word length. I'm open to suggestions.
+- I choosed to split the exhausive words lists into smaller json files by length to load only the files the game need, because the most used words represent only ~10k words meanwhile the exhaustive list represents ~150k words.
+
+* If you need to manually add words in a json file, just add the words to the end and execute the data_sort.py script after updated the json file name in the script.
+
+* Change the labels and texts in the game (and the alphabet in the /src/components/Keybard.jsx) with your language equivalent
+
+There you go !
+
+## Installation
 
 In the project directory, you can run:
+
+### `npm install`
+
+Install the need dependencies on your local machine. 
 
 ### `npm start`
 
@@ -19,10 +52,6 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 The page will reload when you make changes.\
 You may also see any lint errors in the console.
 
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
 ### `npm run build`
 
@@ -34,42 +63,16 @@ Your app is ready to be deployed!
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
 ### Deployment
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+This app uses the react-github-pages library to host the production build.
+Run `npm run deploy` once you modifications are committed/pushed to github.
 
-### `npm run build` fails to minify
+## Previews
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+![The game](./preview_game.png)
+
+![The stats](./preview_stats.png)
+
+[Live page](https://tolexia.github.io/react-wordle/)

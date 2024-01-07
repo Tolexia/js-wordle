@@ -25,7 +25,6 @@ function App()
 		const importWords = async (number) => {
 			const data = await require(`./data/francais_${number}.json`);
 			wordsForTest = wordsForTest.concat(data)
-
 		};
 		for (let i = nb_min; i <= nb_max; i++) {
 			
