@@ -27,7 +27,7 @@ const Stats = function(props)
                     }
                     )
                 }
-                <div className='stats-row' key={"loss"} style={{width:`calc( 100% * ${data["loss"]} / ${maxStat} )`}}>
+                <div className='stats-row' key={"loss"} style={{width:`calc( 100% * ${!isNaN(parseInt(data["loss"])) ?data["loss"] : 0 } / ${maxStat} )`}}>
                     <span className='stat-key' style={{left:"-1.5em"}}>&#128128;</span>
                     <span className='stat-value'>{data["loss"]}</span>
                 </div>

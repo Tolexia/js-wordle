@@ -24,9 +24,7 @@ function App()
 		wordsForTest = []
 		const importWords = async (number) => {
 			const data = await require(`./data/francais_${number}.json`);
-			// console.log("data", data)
 			wordsForTest = wordsForTest.concat(data)
-			// console.log("wordsForTest", wordsForTest)
 
 		};
 		for (let i = nb_min; i <= nb_max; i++) {
@@ -40,12 +38,10 @@ function App()
 	const mustGenNewWord = word == null
 	genWordsData(mustGenNewWord)
 	
-	function getNewWord(attemptCount = 0)
+	function getNewWord(count = 0)
 	{
 		const randomValue = Math.floor(Math.random()*wordsForGen.length)
-		console.log("randomValue", randomValue)
 		let newWord = wordsForGen[randomValue];
-		console.log("wordsForGen[randomValue]", wordsForGen[randomValue])
 		if(!(newWord.length >= nb_min && newWord.length <= nb_max && wordsForTest.includes(newWord)))
 		{
 			newWord = null
@@ -59,14 +55,11 @@ function App()
 				}
 			}
 		}
-		console.log("newWord", newWord)
-		console.log("attemptCount", attemptCount)
-		if(newWord == null && attemptCount < 20)
+		if(newWord == null && count < 20)
 		{
-			attemptCount++;
-			newWord = getNewWord(attemptCount)
+			count++;
+			newWord = getNewWord(count)
 		}
-		console.log("newWord", newWord)
 		localStorage.setItem("currentWord", newWord)
 		document.getElementById("App").style = `--wordlength:${newWord.length}`
 		return newWord;
@@ -155,7 +148,6 @@ function App()
 		{
 			currentRow = (document.querySelector('.row:not(.over)'))
 		}
-		console.log("wordsForTest", wordsForTest)
 		if(currentRow != null)
 		{
 			let selection = "";
@@ -318,7 +310,6 @@ function App()
 	}
 	const generateGrid = function ()
 	{
-		// console.log("correctLetters", correctLetters);
 		return ([...Array(5)].map((x, i) => {
 			const rowValues = [];
 			for (let rowKey = 0; rowKey < word.length; rowKey++) {
