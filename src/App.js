@@ -388,6 +388,13 @@ function App()
 		const rows = document.querySelectorAll('.grid .row.over')
 		rows.forEach(row => setRowColors(row))
 	}, [])
+    try{
+        console.log(word.length)
+    }
+    catch(err) 
+    {
+        window.location.reload()
+    }
 	return (
 		<div id='App' className="App" style={{'--wordlength': word.length}}>
 			<div className='range-container'>

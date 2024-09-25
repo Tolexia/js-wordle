@@ -4,6 +4,7 @@
   --almost: rgb(213, 140, 3);
   --correct: rgb(35, 192, 3);
   --margin: 5px;
+  --grid-item-resolution : 3em;
 }
 *{
   box-sizing: border-box;
@@ -15,7 +16,7 @@ button, a{
 html, body, #root, .App {
   padding: 0;
   margin:0;
-  min-height: 100vh;
+  height: 100%;
   min-width: 100vw;
   width: max-content;
   background-color: var(--bg);
@@ -30,7 +31,6 @@ html, body, #root, .App {
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  min-height: 70vh;
   max-height: 80vh;
 }
 
@@ -51,8 +51,8 @@ html, body, #root, .App {
   /* flex-shrink: 1; */
   /* width: 3em; */
   /* height: 3em; */
-  width: min(3em, calc(90vw / var(--wordlength) - var(--margin)));
-  height: min(3em, calc(90vw / var(--wordlength) - var(--margin)));
+  width: min(var(--grid-item-resolution), calc(90vw / var(--wordlength) - var(--margin)));
+  height: min(var(--grid-item-resolution), calc(90vw / var(--wordlength) - var(--margin)));
   border: 1px  solid var(--color);
   background: transparent;
   padding: 5px;
@@ -201,7 +201,11 @@ input[type=range]:focus::-ms-fill-upper {
 
 @media screen and (min-width:1200px) {
   .App{
-    min-height: 100vh;
     max-height: 100vh;
+  }
+}
+@media screen and (orientation:landscape) and (max-width:1600px) {
+  :root{
+    --grid-item-resolution:2em;
   }
 }
